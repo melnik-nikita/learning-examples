@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{134D955F-DFF1-4C88-830E-C8CC4F427F41}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.editorconfig = ..\..\.editorconfig
+		..\..\.gitignore = ..\..\.gitignore
+		..\..\global.json = ..\..\global.json
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{08B32287-789F-4DCA-B8F4-CDC2A3C820A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{14DE0A4B-E7F8-4DA6-8FE0-9737740CC18B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLRViaCSharp.CLRBasics", "src\CLRViaCSharp.CLRBasics\CLRViaCSharp.CLRBasics.csproj", "{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203} = {08B32287-789F-4DCA-B8F4-CDC2A3C820A7}
+	EndGlobalSection
+EndGlobal
