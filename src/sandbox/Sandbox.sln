@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{0AAA3477-83F8-4127-9D77-D3CAE03F91E6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C97F6E68-D63A-49DE-935F-F27545FDC6CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D661BA38-CB28-4A18-9B39-02068DF69439}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "src\Sandbox\Sandbox.csproj", "{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B} = {C97F6E68-D63A-49DE-935F-F27545FDC6CE}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
