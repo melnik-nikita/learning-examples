@@ -1,4 +1,1 @@
-﻿using BenchmarkDotNet.Running;
-using Sandbox;
-
-BenchmarkRunner.Run<ListBenchmark>();
+﻿Console.WriteLine("Sandbox");

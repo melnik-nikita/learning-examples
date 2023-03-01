@@ -8,6 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D661BA38
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "src\Sandbox\Sandbox.csproj", "{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox.Benchmarks", "src\Sandbox.Benchmarks\Sandbox.Benchmarks.csproj", "{AA76BE8D-EA98-47B4-80A2-299CC56F2D71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,11 +17,16 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B} = {C97F6E68-D63A-49DE-935F-F27545FDC6CE}
+		{AA76BE8D-EA98-47B4-80A2-299CC56F2D71} = {C97F6E68-D63A-49DE-935F-F27545FDC6CE}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D9390CE-7B0A-4F07-B5F5-3569413AFB0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA76BE8D-EA98-47B4-80A2-299CC56F2D71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA76BE8D-EA98-47B4-80A2-299CC56F2D71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA76BE8D-EA98-47B4-80A2-299CC56F2D71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA76BE8D-EA98-47B4-80A2-299CC56F2D71}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

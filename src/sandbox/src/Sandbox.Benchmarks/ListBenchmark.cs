@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-namespace Sandbox;
+namespace Sandbox.Benchmarks;
 
 [MemoryDiagnoser]
 public class ListBenchmark
