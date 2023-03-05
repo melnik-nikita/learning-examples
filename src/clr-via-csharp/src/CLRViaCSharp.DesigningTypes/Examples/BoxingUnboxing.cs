@@ -1,8 +1,8 @@
 ﻿using CLRViaCSharp.DesigningTypes.Interfaces;
 
-namespace CLRViaCSharp.DesigningTypes;
+namespace CLRViaCSharp.DesigningTypes.Examples;
 
-public class BoxingUnboxing : IExample
+internal sealed class BoxingUnboxing : IExample
 {
     /// <inheritdoc />
     public static void Run()

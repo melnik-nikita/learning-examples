@@ -2,9 +2,9 @@
 
 #pragma warning disable CS0219
 
-namespace CLRViaCSharp.DesigningTypes;
+namespace CLRViaCSharp.DesigningTypes.Examples;
 
-public class PrimitiveTypes : IExample
+internal sealed class PrimitiveTypes : IExample
 {
     /// <inheritdoc />
     public static void Run()

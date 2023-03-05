@@ -1,8 +1,8 @@
 ﻿using CLRViaCSharp.DesigningTypes.Interfaces;
 
-namespace CLRViaCSharp.DesigningTypes;
+namespace CLRViaCSharp.DesigningTypes.Examples;
 
-public class ReferenceAndValueTypes : IExample
+internal sealed class ReferenceAndValueTypes : IExample
 {
     /// <inheritdoc />
     public static void Run()

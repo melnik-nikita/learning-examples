@@ -1,4 +1,4 @@
-﻿using CLRViaCSharp.DesigningTypes;
+﻿using CLRViaCSharp.DesigningTypes.Examples;
 using CLRViaCSharp.DesigningTypes.Models;
 
 // What 'new' operator does:
