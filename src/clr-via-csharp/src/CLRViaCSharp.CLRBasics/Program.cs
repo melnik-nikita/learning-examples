@@ -1,9 +1,9 @@
-﻿namespace CLRBasics;
+﻿namespace CLRViaCSharp.CLRBasics;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
-        Console.WriteLine("C# via CLR is hard");
+        Console.WriteLine("C# via CLR is fun");
     }
 }

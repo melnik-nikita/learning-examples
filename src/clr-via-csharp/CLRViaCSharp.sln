@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{14DE0A4B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLRViaCSharp.CLRBasics", "src\CLRViaCSharp.CLRBasics\CLRViaCSharp.CLRBasics.csproj", "{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLRViaCSharp.DesigningTypes", "src\CLRViaCSharp.DesigningTypes\CLRViaCSharp.DesigningTypes.csproj", "{84A9D4D5-F362-4DED-AF10-59A6AE4245A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,8 +26,13 @@ Global
 		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A9D4D5-F362-4DED-AF10-59A6AE4245A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A9D4D5-F362-4DED-AF10-59A6AE4245A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A9D4D5-F362-4DED-AF10-59A6AE4245A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A9D4D5-F362-4DED-AF10-59A6AE4245A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{78ACAF6E-324D-4747-8D1C-BEF8E7F5B203} = {08B32287-789F-4DCA-B8F4-CDC2A3C820A7}
+		{84A9D4D5-F362-4DED-AF10-59A6AE4245A6} = {08B32287-789F-4DCA-B8F4-CDC2A3C820A7}
 	EndGlobalSection
 EndGlobal
