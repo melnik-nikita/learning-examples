@@ -13,6 +13,8 @@ using CLRViaCSharp.DesigningTypes.Models;
 //      Eventually, System.Object's constructor is called, and this constructor method does nothing but return.
 var employee = new Employee();
 
-BoxingUnboxing.Run();
+// BoxingUnboxing.Run();
+
+MethodsExample.Run();
 
 Console.ReadLine();
