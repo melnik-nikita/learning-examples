@@ -116,3 +116,42 @@ What 'new' operator does:
     - Must always have a return type of void, and they cannot have any parameters marked with the out modifier
     - Declaration and implementation should have identical signatures
     - Partial methods are always considered to be private methods (also compiler forbids putting access modifier)
+
+# Parameters
+
+- __Optional and Named Parameters__
+    - Default values for the parameters of methods, constructor methods, and parameterful properties (C# indexes) can be
+      specified
+    - Parameters with default values must come after any parameters that do not have default values with one exception:
+      a ___params___ array parameter must come after all parameters, and the array cannot have a default value itself
+    - Default values must me constant values known at compile time
+    - If parameter variables are renamed, any callers who are passing arguments by parameter name will have to modify
+      their code
+    - Changing a parameter's default value is potentially dangerous if the method is called from outside the module (a
+      call side embeds the default value into its call, so without recompiling caller the old value may be used)
+    - default values for ___ref___ or ___out___ parameters cannot be set
+- __Passing Parameters by Reference to a Method__
+    - All parameters are passed by value by default
+        - When reference type objects are passed, the reference to the object is passed (by value) to the method (so the
+          caller can modify object fields)
+        - For value type instances, a copy of the instance is passed to the method
+    - ___ref___ and ___out___ keywords are used to pass parameters by reference
+        - If a method's parameter is marked with ___out___, the caller isn't expected to have initialized the object
+          prior to calling the method.
+            - THE CALLED METHOD MUST write value to the parameter before returning
+        - If a method's parameter is marked with ___ref___, THE CALLER MUST initialize the parameter's value prior to
+          calling the method.
+            - the called method can read from the value and/or write the value
+    - With value types, ___out___ and ___ref___ allow a method to manipulate a single value type instance, the caller
+      must allocate the memory for the instance, and the callee manipulates that memory
+    - With reference types, the caller allocates memory for a pointer to a reference object, and the callee manipulates
+      this pointer
+- __Passing a variable number of arguments to a method__
+    - ___params___ keyword allows us to define a method that can accept a variable number of arguments
+    - the ___params___ keyword tells the compiler to apply an instance of ___ParamsArrayAttribute___ custom attribute to
+      the parameter
+    - only the last parameter to a method can be marked with the ___params___ keyword
+- __Parameter and Return type Guidelines__
+    - When declaring a method's parameter types, you should specify the weakest type possible, preferring interfaces
+      over base classes
+    - It is usually best to declare a method's return type by using hte strongest type possible
