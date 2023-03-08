@@ -155,3 +155,17 @@ What 'new' operator does:
     - When declaring a method's parameter types, you should specify the weakest type possible, preferring interfaces
       over base classes
     - It is usually best to declare a method's return type by using hte strongest type possible
+
+# Properties
+
+- A property is a ember that provides a flexible mechanism to read, write or compute the alue of a private field.
+- They are special methods called ___accessors___
+- A ___get___ property accessor is used to return the property value, and a ___set___ property accessor is used to
+  assign a new
+  value
+- The ___value___ keyword is used to define the value being assigned by the set or init accessor.
+- Properties can be read-write (they have both a get and a set accessor), read-only (they have a get accessor but no set
+  accessor), or write-only (they have a set accessor, but no get accessor). Write-only properties are rare and are most
+  commonly used to restrict access to sensitive data.
+- Simple properties that require no custom accessor code can be implemented either as expression body definitions or as
+  auto-implemented properties.
