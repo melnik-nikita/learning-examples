@@ -84,7 +84,7 @@ internal sealed class BoxingUnboxing : IExample
     }
 }
 
-internal struct Point : IComparable, IChangeBoxedPoint
+file struct Point : IComparable, IChangeBoxedPoint
 {
     private Int32 m_x, m_y;
 
@@ -126,7 +126,7 @@ internal struct Point : IComparable, IChangeBoxedPoint
     }
 }
 
-internal interface IChangeBoxedPoint
+file interface IChangeBoxedPoint
 {
     void Change(Int32 x, Int32 y);
 }

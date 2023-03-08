@@ -25,7 +25,7 @@ public class MethodsExample : IExample
     }
 }
 
-internal sealed class SomeType
+file sealed class SomeType
 {
     private Int32 x = 5;
 
@@ -46,7 +46,7 @@ file struct Point
     public Int32 Y => y;
 }
 
-sealed file class SomeRefType
+file sealed class SomeRefType
 {
     static SomeRefType()
     {
@@ -64,7 +64,7 @@ file struct SomeValType
 }
 
 // Operator overload
-internal sealed class Complex
+file sealed class Complex
 {
     public Int32 X { get; set; }
 
@@ -75,7 +75,7 @@ internal sealed class Complex
 }
 
 // Conversion operator
-sealed file class Rational
+file sealed class Rational
 {
     private readonly float _num;
 
@@ -121,7 +121,7 @@ sealed file class Rational
 }
 
 // Extension methods
-public static class StringBuilderExtensions
+file static class StringBuilderExtensions
 {
     public static Int32 IndexOf(this StringBuilder sb, Char value)
     {
@@ -138,7 +138,7 @@ public static class StringBuilderExtensions
 }
 
 // Partial methods
-sealed file partial class Base
+file sealed partial class Base
 {
     private String _name;
 
@@ -155,7 +155,7 @@ sealed file partial class Base
     }
 }
 
-sealed file partial class Base
+file sealed partial class Base
 {
     partial void OnNameChanging(string value)
     {
