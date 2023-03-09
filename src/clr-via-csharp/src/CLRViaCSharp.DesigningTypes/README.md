@@ -169,3 +169,29 @@ What 'new' operator does:
   commonly used to restrict access to sensitive data.
 - Simple properties that require no custom accessor code can be implemented either as expression body definitions or as
   auto-implemented properties.
+
+# Events
+
+Defining an event member means that a type is offering the following capabilities:
+
+- A method can register its interest i the event
+- A method can unregister its interest in the event
+- Registered methods will be notified when event occurs
+
+#### Designing a type that exposes an event
+
+- Step 1: Define a type that will hold any additional info that should be sent to receivers of the event notification
+    - classes that hold event information to be passed to hte event handler should be derived from
+      ___System.EventArgs___
+    - the name of the class should be suffixed with ___EventArgs___
+- Step 2: Define the event member
+- Step 3: Define a method responsible for raising the event to notify registered objects that the event has occurred
+    - By convention, the class should define a protected, virtual method that is called by code internally withing the
+      class and its derived classes whe the event is to be raised
+- Step 4: Define a method that translates the input into the desired event
+
+#### Designing a type that listens for an event
+
+- Create a class and define method that type, that exposes the event, will call when event occurs
+- Register our callback method in an event
+- Unregister callback when no longer need to receive events
