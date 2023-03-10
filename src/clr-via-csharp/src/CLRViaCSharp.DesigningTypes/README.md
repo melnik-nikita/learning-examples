@@ -195,3 +195,98 @@ Defining an event member means that a type is offering the following capabilitie
 - Create a class and define method that type, that exposes the event, will call when event occurs
 - Register our callback method in an event
 - Unregister callback when no longer need to receive events
+
+# Generics
+
+Generics is a mechanism, offered by the CLR, that provides code reuse in a form of ___algorithm reuse___
+
+### CLR allows the creation of generic:
+
+- reference types
+- value types
+- interfaces
+- delegates
+- methods, that defined in a reference type, value type or interface
+
+### Generics provide the following benefits:
+
+- Source code protection
+- Type safety
+- Cleaner code
+- Better performance
+
+### Code explosion
+
+CLR generates native code for every generic method/type combination - which is called code explosion. This end up
+increasing hte application's working set, hurting the performance.
+To avoid this CLR does some optimisations:
+
+- CLR will compile the code for method/type combination just once.
+- CLR considers all reference type arguments to be identical, so the code is shared. (for any ref type the same
+  generated code is used)
+- For a value types, CLR must produce native code specifically for that value type, because value types can vary in
+  size.
+
+## Verifiability and Constraints
+
+- A constraint is a way to limit the number of types that can be specified for a generic argument.
+
+```
+public static Min<T>(T o1, T o2) where T : IComparable<T> {
+    // implementation goes here
+}
+```
+
+- The CLR doesn't allow overloading based on type parameter names or constraints; you can overload types or methods
+  based only on arity
+
+```
+// This is ok
+internal sealed class AType {}
+internal sealed class AType<T> {}
+internal sealed class AType<T1, T2> {}
+// This conflicts with AType<T> that has no constraints
+internal sealed class AType<T> where T : IComparable<T> {}
+// Error: basicaly the same as AType<T1, T2>
+internal sealed class AType<T3, T4> {}
+```
+
+- when overriding a virtual generic method, the overriding method must specif the same number of type parameters, and
+  these type parameters will inherit the constraints specified on the by the base class's method.
+
+### Type parameter constraints
+
+1. Primary constraint
+2. Secondary constraint
+3. Constructor constraint
+
+#### Primary constraints
+
+- A type parameter can have zero or one primary constraint.
+- Can be a ref type that is not sealed
+- There are 2 special types of primary constraint: ___class___ and ___struct___
+
+#### Secondary constraints
+
+- A type parameter can specify zero or more secondary constraints where a secondary constraint represents an interface
+  type.
+- A type parameter constraint allows a generic type or a method to indicate that there ust be a relationship between
+  specified type arguments (can be zero or more)
+
+```
+private static List<TBase> ConvertIList<T, TBase>(IList<T> list) where T : TBase
+{
+    List<TBase> baseList = new List<TBase>(list.Count);
+    for(int index = 0; index < list.Count; index++)
+    {
+        baseList.Add(list[index]);
+    }
+    return baseList;
+}
+```
+
+#### Constructor constraints
+
+- A type parameter can specify zero constructor constraints or one constructor constraint
+- When specified, you are promising hte compiler that a specified type argument will be a non-abstract type that
+  implements a public parameterless constructor

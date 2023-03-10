@@ -1,6 +1,6 @@
 ﻿namespace CLRViaCSharp.DesigningTypes.Interfaces;
 
-public interface IExample
+internal interface IExample
 {
     public static abstract void Run();
 }
