@@ -9,6 +9,7 @@ while (string.IsNullOrEmpty(line))
     // ParametersExample.Run();
     // PropertiesExample.Run();
     // EventsExample.Run();
-    GenericsExample.Run();
+    // GenericsExample.Run();
+    InterfacesExample.Run();
     line = Console.ReadLine();
 }

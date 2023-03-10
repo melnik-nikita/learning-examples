@@ -290,3 +290,17 @@ private static List<TBase> ConvertIList<T, TBase>(IList<T> list) where T : TBase
 - A type parameter can specify zero constructor constraints or one constructor constraint
 - When specified, you are promising hte compiler that a specified type argument will be a non-abstract type that
   implements a public parameterless constructor
+
+# Interfaces
+
+An Interface is a named set of method signatures.
+
+- cannot define any ctor methods
+- not allowed to define any instance fields
+- C# compiler requires that a method that implements an interface be marked as ___public___
+- The CLR requires that interface methods be marked as ___virtual___
+- If method is not marked as ___virtual___, compiler marks virtual and sealed; this prevents a derived class from
+  overriding the interface method
+- Derived class can re-inherit same interface and provide own implementation
+- When you cast an instance of a value type to an interface type, the value type instance must be boxed (because an
+  interface variable is a ref that must point to an object on the heap)
