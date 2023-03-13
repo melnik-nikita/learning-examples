@@ -1,4 +1,4 @@
-﻿namespace CLRViaCSharp.EssentialTypes;
+﻿namespace CLRViaCSharp.EssentialTypes.Examples;
 
 internal static class CharactersExample
 {
