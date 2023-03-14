@@ -39,3 +39,22 @@ Enumerated types can define methods using __extension method__ syntax.
 - All arrays __implicitly__ implement ___IEnumerable___, ___ICollection___, and ___IList___
 
 __Array covariance__ - when one array type is casted to another array type
+
+# Delegates (aka callback in other languages)
+
+A ___Delegate___ is a type that represents references to methods with a particular parameter list and return type.
+
+- delegates ensure that a callback method is type-safe
+- integrate the ability to call multiple methods sequentially
+- support the calling of static methods as well as instance methods
+- c# and the CLR allow covariance and contra-variance of reference types when binding ta method to a delegate
+    - covariance means that a method can return a type that is derived from the delegate's return type
+    - contra-variance means that a method can take a parameter that is a base of the delegate's parameter type
+    - covariance and contra-variance is supported by reference types only
+  ```
+  delegate Object MyCallback(FileStream fs);
+  string SomeMethod(Stream s); // valid 
+  Int32 SomeOtherMethod(Stream s); // invalid
+  ```
+- ___lambda expressions___ may be used where a delegate is expected
+- 

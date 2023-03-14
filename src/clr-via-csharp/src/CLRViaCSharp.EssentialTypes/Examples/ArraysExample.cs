@@ -1,6 +1,6 @@
 ﻿namespace CLRViaCSharp.EssentialTypes.Examples;
 
-public static class ArraysExample
+internal static class ArraysExample
 {
     public static void Run()
     {
