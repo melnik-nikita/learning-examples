@@ -30,3 +30,12 @@ ___int___ (default), ___uint___.
 Bit flags represent a set of bits, some of which are on, and some of which are off. (Enums may have only one value)
 
 Enumerated types can define methods using __extension method__ syntax.
+
+# Arrays
+
+- Arrays are mechanisms that allow you to treat several items as a single collection.
+- Arrays can be single-dimensional, multi-dimensional and jagged (arrays of arrays)
+- Arrays are always reference types
+- All arrays __implicitly__ implement ___IEnumerable___, ___ICollection___, and ___IList___
+
+__Array covariance__ - when one array type is casted to another array type
