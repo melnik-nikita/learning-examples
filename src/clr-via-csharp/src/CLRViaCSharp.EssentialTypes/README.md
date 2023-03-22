@@ -77,3 +77,21 @@ Attributes can have prefixes to indicate the target the attribute applies to.
 [property: SomeAttr]
 [event: SomeAttr]
 ```
+
+# Nullable Value Types
+
+A nullable value type T? represents all values of its underlying value type T and an additional null value.
+Any nullable value type is an instance of the generic System.Nullable<T> structure.
+You typically use a nullable value type when you need to represent the undefined value of an underlying value type.
+__How c# interprets the operators__
+
+- Unary operators (+, ++, -, --, !, ~)- if operand is null, the result is null.
+- Binary operators (+, -, *, /, %, &, |, ^, <<, >>) - if either of operand is null, the result is null. (boolean? is
+  exception for & and |)
+- Equality operators (==, !=) - if both null, then equal. If one is null, then not equal. If no null, compares values.
+- Relational operators (<, >, <=, >=) - if either operand is null, result is false. If neither is null, compares values.
+
+### Null coalescing operator (??)
+
+If the operand on the left is not null, the operand's value is returned. Otherwise the value of the right operand is
+returned.
