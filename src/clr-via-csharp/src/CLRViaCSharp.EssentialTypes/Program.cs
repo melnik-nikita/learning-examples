@@ -4,4 +4,5 @@
 // StringsExample.Run();
 // EnumeratedTypesExample.Run();
 // ArraysExample.Run();
-DelegatesExample.Run();
+// DelegatesExample.Run();
+CustomAttributesExample.Run();

@@ -57,4 +57,23 @@ A ___Delegate___ is a type that represents references to methods with a particul
   Int32 SomeOtherMethod(Stream s); // invalid
   ```
 - ___lambda expressions___ may be used where a delegate is expected
-- 
+
+# Custom Attributes
+
+Custom attributes allow to declaratively annotate code constructs, enabling special feature. The allow information to be
+defined and applied to almost any metadata table entry. The metadata info can be queried at run time to dynamically
+alter the way code executes.
+Custom attributes are just a way to associate additional information with target.
+Attributes can have prefixes to indicate the target the attribute applies to.
+
+```
+[assembly: SomeAttr]
+[module: SomeAttr]
+[type: SomeAttr]
+[field: SomeAttr]
+[return: SomeAttr]
+[method: SomeAttr]
+[param: SomeAttr]
+[property: SomeAttr]
+[event: SomeAttr]
+```
