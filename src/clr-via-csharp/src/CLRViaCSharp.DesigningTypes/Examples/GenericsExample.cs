@@ -1,4 +1,4 @@
-﻿using CLRViaCSharp.DesigningTypes.Interfaces;
+﻿using CLRViaCSharp.Common.Interfaces;
 
 namespace CLRViaCSharp.DesigningTypes.Examples;
 

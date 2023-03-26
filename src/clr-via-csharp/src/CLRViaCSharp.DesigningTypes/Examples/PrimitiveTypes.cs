@@ -1,4 +1,4 @@
-﻿using CLRViaCSharp.DesigningTypes.Interfaces;
+﻿using CLRViaCSharp.Common.Interfaces;
 
 #pragma warning disable CS0219
 
