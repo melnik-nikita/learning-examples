@@ -117,3 +117,19 @@ AppDomain features:
 - AppDomains can be individually configured
 
 ![single-windows-process-with-multiple-appdomains](../../img/single-windows-process-with-multiple-appdomains.png "A single Windows process hosting the CLR and two AppDomains")
+
+# Assembly Loading and Reflection
+
+Reflection drawbacks:
+
+- Reflection prevents type safety at compile time.
+- Reflection is slow.
+
+Constructing an Instance of a Type:
+
+- System.Activator's CreateInstance methods
+- System.Activator's CreateInstanceFrom methods
+- System.AppDomain's methods (CreateInstance, CreateInstanceAndUnwrap, CreateInstanceFrom, CreateInstanceFromAndUnwrap)
+- System.Reflection.ConstructorInfo's Invoke instance method
+
+![reflections-object-model](../../img/reflections-object-model.png "Types an application uses to walk reflection's object model")
