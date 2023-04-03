@@ -45,7 +45,8 @@ C#'s ___new___ operator causes CLR to perform the following steps:
    space, the type's ctor is called passing NextObjPtr, and the new operator returns the reference to an object. Just
    before the reference is returned, NextObjPointer is advanced past the object and now points to the address where the
    next object will be placed in the heap.
-   ![managed-heap-next-obj-ptr](../../img/managed-heap-next-obj-ptr.png "Managed heap NextObjPtr")
+
+![managed-heap-next-obj-ptr](../../img/managed-heap-next-obj-ptr.png "Managed heap NextObjPtr")
 
 ### The garbage collection algorithm
 
@@ -100,3 +101,19 @@ The CLR treats large objects slightly differently that how it treats small objec
 
 ___Finalization___ - allows an object to execute some code after the object has been determined to be garbage but before
 the object's memory is reclaimed from the managed heap.
+
+# CLR Hosting and AppDomains
+
+Hosting allows any application to use the features of the common language runtime (CLR).
+AppDomains allow third-party untrusted code to un in an existing process, and the CLR guarantees that the data
+structures, code, and security context will not be exploited or compromised.
+
+An ___AppDomain___ is a logical container for a set of assemblies.
+AppDomain features:
+
+- objects created by code in one AppDomain cannot be accessed directly by code in another AppDomain.
+- AppDomains can be unloaded.
+- AppDomains can be individually secured
+- AppDomains can be individually configured
+
+![single-windows-process-with-multiple-appdomains](../../img/single-windows-process-with-multiple-appdomains.png "A single Windows process hosting the CLR and two AppDomains")
