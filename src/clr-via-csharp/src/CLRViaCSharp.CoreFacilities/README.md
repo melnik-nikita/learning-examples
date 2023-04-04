@@ -1,4 +1,6 @@
-﻿# Exceptions and State Management
+﻿# Core Facilities
+
+# Exceptions and State Management
 
 An exception is when a member fails to complete the task it is supposed to perform as indicated by its name.
 
@@ -133,3 +135,9 @@ Constructing an Instance of a Type:
 - System.Reflection.ConstructorInfo's Invoke instance method
 
 ![reflections-object-model](../../img/reflections-object-model.png "Types an application uses to walk reflection's object model")
+
+# Runtime Serialization
+
+___Serialization___ is a process of converting an object or a graph of connected objects into a stream of bytes.
+
+___Deserialization___ is the process of converting a stream of bytes back into its graph of connected objects.
