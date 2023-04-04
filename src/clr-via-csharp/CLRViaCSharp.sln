@@ -25,6 +25,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{37FB5E21-DA11-40E4-919C-6ED5FE2A6B7B}"
 	ProjectSection(SolutionItems) = preProject
 		img\managed-heap-next-obj-ptr.png = img\managed-heap-next-obj-ptr.png
+		img\reflections-object-model.png = img\reflections-object-model.png
+		img\single-windows-process-with-multiple-appdomains.png = img\single-windows-process-with-multiple-appdomains.png
 	EndProjectSection
 EndProject
 Global
