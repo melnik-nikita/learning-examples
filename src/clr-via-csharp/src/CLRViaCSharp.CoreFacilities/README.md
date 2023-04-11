@@ -1,6 +1,12 @@
 ﻿# Core Facilities
 
-# Exceptions and State Management
+1. [Exceptions and State Management](#exceptions-and-state-management)
+2. [The managed heap and garbage collection](#the-managed-heap-and-garbage-collection)
+3. [CLR Hosting and AppDomains](#clr-hosting-and-appdomains)
+4. [Assembly Loading and Reflection](#assembly-loading-and-reflection)
+5. [Runtime Serialization](#runtime-serialization)
+
+## Exceptions and State Management
 
 An exception is when a member fails to complete the task it is supposed to perform as indicated by its name.
 
@@ -26,7 +32,7 @@ associated with it.
 
 The ___finally block___ contains code that's guarantee to execute.
 
-## Exception Guidelines and Best Practices
+### Exception Guidelines and Best Practices
 
 - Use ___finally___ blocks liberally
 - Don't ___catch___ everything
@@ -34,7 +40,7 @@ The ___finally block___ contains code that's guarantee to execute.
 - Backing out of a partially completed operation when an unrecoverable exception occurs - maintaining state
 - Hiding an implementation detail to maintain a 'Contract'
 
-# The managed heap and garbage collection
+## The managed heap and garbage collection
 
 The CLR requires that all objects to be allocated from the ___managed heap___.
 
@@ -104,7 +110,7 @@ The CLR treats large objects slightly differently that how it treats small objec
 ___Finalization___ - allows an object to execute some code after the object has been determined to be garbage but before
 the object's memory is reclaimed from the managed heap.
 
-# CLR Hosting and AppDomains
+## CLR Hosting and AppDomains
 
 Hosting allows any application to use the features of the common language runtime (CLR).
 AppDomains allow third-party untrusted code to un in an existing process, and the CLR guarantees that the data
@@ -120,7 +126,7 @@ AppDomain features:
 
 ![single-windows-process-with-multiple-appdomains](../../img/single-windows-process-with-multiple-appdomains.png "A single Windows process hosting the CLR and two AppDomains")
 
-# Assembly Loading and Reflection
+## Assembly Loading and Reflection
 
 Reflection drawbacks:
 
@@ -136,7 +142,7 @@ Constructing an Instance of a Type:
 
 ![reflections-object-model](../../img/reflections-object-model.png "Types an application uses to walk reflection's object model")
 
-# Runtime Serialization
+## Runtime Serialization
 
 ___Serialization___ is a process of converting an object or a graph of connected objects into a stream of bytes.
 
