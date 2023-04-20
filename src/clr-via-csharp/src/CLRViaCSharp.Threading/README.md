@@ -80,6 +80,227 @@ quickly, then worker threads will be destroyed.
 
 ## I/O-Bound Asynchronous Operations
 
+When you mark a method as ___async___, the compiler basically transforms your method's code into a type that
+implements a state machine.
+
+Async functions restrictions:
+
+- Cannot have any ___out___ or ___ref___ parameters
+- Cannot use the ___await___ operator inside a ___catch___, ___finally___, or ___unsafe___ block
+- Cannot take a lock that supports thread ownership or recursion before an await operator and release it after the
+  await operator. The reason is because one thread might execute the code before the ___await___ and a different
+  thread might execute the code after the await. If you use ___await___ within a C# ___lock___ statement, the
+  compiler issues an error. If explicitly call ___Monitor's Enter___ and ___Exit___ instead, the code will compile but
+  ___Monitor.Exit___ will throw a ___SynchronizationLockException___ at run time
+- Within a query expression, the await opertor may only be used withing the first collection expression of the
+  initial ___from___ clause or within the collection expression of a ___join___ clause
+
+How compiler transforms async function into a state machine
+
+```c#
+private static async Task<String> MyMethodAsync(Int32 argument)
+{
+    var local = argument;
+    try {
+        var result1 = await Method1Async();
+        for (var x = 0; x < 3; x++)
+        {
+            var result2 = await Method2Async();
+        }
+    } catch (Exception) {
+        Console.WriteLine("Catch");
+    } finally {
+        Console.WriteLine("Finally");
+    }
+    return "Done";
+}
+```
+
+```c#
+// AsyncStateMachine attribute indicates an asnc method (good for tools using reflection);
+// the type indicates which structure implements the state machine
+[AsyncStateMachine(typeof (IOBoundAsynchronousOperations.<MyMethodAsync>d__3))]
+[DebuggerStepThrough]
+private static Task<string> MyMethodAsync(int argument)
+{
+    // Create state mechine instance & initialize it
+    IOBoundAsynchronousOperations.<MyMethodAsync>d__3 stateMachine = new IOBoundAsynchronousOperations.<MyMethodAsync>d__3();
+    
+    // Create builde returning Task<String> from this stub method
+    // State machine accesses builder to set Task completion/exception
+    stateMachine.<>t__builder = AsyncTaskMethodBuilder<string>.Create();
+    
+    stateMachine.argument = argument; // Copy arguments to state machine fields
+    stateMachine.<>1__state = -1; // Initialize state machine
+    
+    // Start executin the state machine
+    stateMachine.<>t__builder.Start<IOBoundAsynchronousOperations.<MyMethodAsync>d__3>(ref stateMachine);
+    return stateMachine.<>t__builder.Task;
+}
+```
+
+```c#
+// THis is the state machine structure
+[CompilerGenerated]
+private sealed class<MyMethodAsync> d__3 : /*[Nullable(0)]*/ IAsyncStateMachine {
+    // Fields for state machine's builder (Task) & its location
+    public int<> 1__state;
+    [Nullable(0)]
+    public AsyncTaskMethodBuilder<string><> t__builder;
+    
+    // Argument and local variables are fields now:
+    public int argument;
+    private int<local> 5__1;
+    [Nullable(0)]
+    private Type1<result1> 5__2;
+    [Nullable(0)]
+    private Type1<> s__3;
+    private int<x> 5__4;
+    [Nullable(0)]
+    private Type2<result2> 5__5;
+    [Nullable(0)]
+    private Type2<> s__6;
+    
+    // There is 1 field per awaiter type.
+    // Only 1 of these fields is important at any time. That field referes
+    // to the most recently executed await that is completing asynchronously
+    [Nullable(new byte[] { 0, 1 })]
+    private TaskAwaiter<Type1><> u__1;
+    [Nullable(new byte[] { 0, 1 })]
+    private TaskAwaiter<Type2><> u__2;
+
+    public<MyMethodAsync> d__3() {
+        base..ctor();
+    }
+
+    // This is the state machine method itself
+    void IAsyncStateMachine.MoveNext() {
+        int num = this.<>1__state;
+        string result; // Task's result value
+        
+        // Compiler-inserted try block ensures the state machine's task completes
+        try {
+            if ((uint)num > 1U)
+                this.<local>5__1 = this.argument;
+                
+            // Try block that we had in our original code
+            try {
+                TaskAwaiter<Type1> awaiter1;
+                TaskAwaiter<Type2> awaiter2;
+                if (num != 0) {
+                    if (num != 1) { // start execution of code in 'try'
+                        // Call 'Mehtod1Async' and get its awaiter
+                        awaiter1 = IOBoundAsynchronousOperations.Method1Async().GetAwaiter();
+                        if (!awaiter1.IsCompleted) {
+                            this.<>1__state = num = 0; // 'Method1Async' is completing asynchronously
+                            this.<>u__1 = awaiter1; // Save the awaiter for when we come back
+                            // Capture state machine into a variable
+                            IOBoundAsynchronousOperations.<MyMethodAsync>d__3 stateMachine = this;
+                            // Tell awaiter to call MoveNext when operation coompletes
+                            this.<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<Type1>, IOBoundAsynchronousOperations.<MyMethodAsync>d__3>(
+                                ref awaiter1, ref stateMachine);
+                            return; // Thread returns to caller
+                        }
+                    } else { // 'Mehtod2Async' completed asynchronously
+                        awaiter2 = this.<>u__2; // Restore mose recent awaiter
+                        this.<>u__2 = new TaskAwaiter<Type2>();
+                        this.<>1__state = num = -1;
+                        goto label_13; // navigate to ForLoopEpilog
+                    }
+                } else { // 'Method1Async' completed asynchronously
+                    awaiter1 = this.<>u__1; // Restore most-recent awaiter
+                    this.<>u__1 = new TaskAwaiter<Type1>();
+                    this.<>1__state = num = -1;
+                }
+                // After the first await, we capture the result & start the 'for' loop
+                this.<>s__3 = awaiter1.GetResult(); // Get awaiter's result
+                this.<result1>5__2 = this.<>s__3;
+                this.<>s__3 = (Type1)null;
+                this.<x>5__4 = 0; // 'for' loop initialization
+                goto label_14; // Skip to 'for' loop body
+            label_13: // ForLoopEpilog
+                this.<>s__6 = awaiter2.GetResult();
+                this.<result2>5__5 = this.<>s__6;
+                this.<>s__6 = (Type2)null;
+                this.<result2>5__5 = (Type2)null;
+                ++this.<x>5__4; // Increment 'x' after each loop iteration
+                // fall into the 'for' loop body
+            label_14: // ForLoopBody
+                if (this.<x>5__4 < 3) { // 'for' loop test
+                    // Call 'Method2Async' and get its awaiter
+                    awaiter2 = IOBoundAsynchronousOperations.Method2Async().GetAwaiter();
+                    if (!awaiter2.IsCompleted) {
+                        this.<>1__state = num = 1; // 'Method2Async' is completing asynchronously
+                        this.<>u__2 = awaiter2; // Save the awaiter for when we come back
+                        
+                        // // Capture state machine into a variable
+                        IOBoundAsynchronousOperations.<MyMethodAsync>d__3 stateMachine = this;
+                        // Tell awaiter to call MoveNext when opertion completes
+                        this.<>t__builder.AwaitUnsafeOnCompleted<TaskAwaiter<Type2>, IOBoundAsynchronousOperations.<MyMethodAsync>d__3>(
+                            ref awaiter2, ref stateMachine);
+                        // Thread returns to caller
+                        return;
+                    }
+                    goto label_13; // navigate to ForLoopEpilog
+                } else
+                    this.<result1>5__2 = (Type1)null;
+            } catch (Exception ex) {
+                Console.WriteLine("Catch");
+            } finally {
+                // Whenever a thread physically leaves a 'try', the 'finally' executes
+                // We only want to execute this code when the thread logically leaves the 'try'
+                if (num < 0)
+                    Console.WriteLine("Finally");
+            }
+            result = "Done"; // What we ultimately want to return from the async function
+        } catch (Exception ex) {
+            // Unhandled exception: complete state machine's Task with exception
+            this.<>1__state = -2;
+            this.<>t__builder.SetException(ex);
+            return;
+        }
+        this.<>1__state = -2;
+        
+        // No exception: complete state machine's Task with result
+        this.<>t__builder.SetResult(result);
+    }
+
+    [DebuggerHidden]
+    void IAsyncStateMachine.SetStateMachine(IAsyncStateMachine stateMachine) {}
+}
+```
+
+### Async functions and exception handling
+
+When using ___await___ with ___Task___ the first inner exception is thrown instead of an ___AggregateException___.
+If ___async___ function has a void return type, there is no way for a caller to discover the unhandled exception. So,
+when a ___void___-returning async function throws an unhandled exception, the compiler-generated code catches it and
+causes it to be rethrown using the caller's synchronization context. Usually, rethrowing these exceptions causes the
+whole process to terminate
+
+### Initiate an async function from a thread other that the thread that calls it
+
+```c#
+// Task.Run is called on the GUI thread
+Task.Run(async() => {
+    // This code runs on a thread pool thread
+    // TODO: do intensive compute-bound processing here...
+    
+    await XxxAsync(); // Initiate asynchronous operation
+    // Do more processing here
+});
+```
+
+### Applications and Their Threading Models
+
+The FCL defines a base class called ___System.Threading.SynchronizationContext___.
+___SynchronizationContext___-derived object connects an application model to its threading model.
+
+When you await a Task, The calling thread's SynchronizationContext object is obtained. When a thread pool thread
+completes the Task, the SynchronizationContext object is used, ensuring the right threading model for your
+application model. So, when a GUI thread awaits a Task, the code following the await operator is guaranteed to
+execute on the GUI thread as well, allowing that code to update UI elements.
+
 [Back to top ⇧](#threading)
 
 ## Primitive Thread Synchronization Constructs
