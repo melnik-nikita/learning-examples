@@ -305,6 +305,104 @@ execute on the GUI thread as well, allowing that code to update UI elements.
 
 ## Primitive Thread Synchronization Constructs
 
+Thread synchronization is used to prevent corruption when multiple threads access shared data ___at the same time___.
+
+There are two kinds of primitive constructs:
+
+- user-mode (preferred as faster than kernel mode, as special CPU instructions used to coordinate threads)
+- kernel-mode
+
+### User-mode constructs
+
+CLR guarantees that reads and writes to a variables of the following data types are atomic: Boolean, Char, (S)Byte,
+(U)Int16, (U)Int32, (U)IntPtr, Single and reference types.
+
+There are two kinds of primitive user-mode thread synchronization constructs:
+
+- ___Volatile constructs___, which perform an atomic read or write operation on a variable containing a simple data
+  type at a specific time
+- ___Interlocked constructs___, which perform an atomic read and write operation on a variable containing a simple
+  data type at a specific time
+
+#### Volatile constructs
+
+When threads are communicating with each other via shared memory, write the last value by calling ___Volatile.Write___
+and read the first value by calling ___Volatile.Read___
+
+To make sure that ___Volatile.Read___ and ___Volatile.Write___ are used correctly ___volatile___ keyword was
+introduced. The JIT compiler ensures that al accesses to a volatile field are performed as volatile reads and writes.
+Furthermore, the ___volatile___ keyword tells the c# and JIT compilers not to cache the field in a CPU register,
+ensuring that all reads to and from the field actually cause the value to be read from memory
+
+```c#
+internal sealed class ThreadsSharingData                                    |internal sealed class ThreadsSharingData
+{                                                                           |{
+    private Int32 _flag = 0;                                                |    private volatile Int32 _flag = 0;
+    private Int32 _value = 0;                                               |    private Int32 _value = 0;
+                                                                            |
+    // This method is executed by one thread                                |    // This method is executed by one thread
+    public void Thread1()                                                   |    public void Thread1()
+    {                                                                       |    {
+        // Note: 5 must be written to _value before 1 is written to _flag   |        // Note: 5 must be written to _value before 1 is written to _flag
+        _value = 5;                                                         |        _value = 5;
+        Volatile.Write(ref _flag, 1);                                       |        _flag = 1;
+    }                                                                       |    }
+                                                                            |
+    // This method is executed by another thread                            |    // This method is executed by another thread
+    public void Thread2()                                                   |    public void Thread2()
+    {                                                                       |    {
+        // Note: _value must be read after _flag is read                    |        // Note: _value must be read after _flag is read
+        if (Volatile.Read(ref _flag) == 1)                                  |        if (_flag == 1)
+        {                                                                   |        {
+            Console.WriteLine(_value);                                      |            Console.WriteLine(_value);
+        }                                                                   |        }
+    }                                                                       |    }
+}                                                                           |}
+```
+
+#### Interlocked constructs
+
+Each of the System.Threading.Interlocked class's methods perform an atomic read wnd write operation. In addition,
+all the Interlocked methods are full memory fences (any variable writes before the call to an Interlocked method
+execute before the Interlocked method, and any variable reads after the call execute after the call).
+
+### Kernel-Mode constructs
+
+Much slower that the user-mode constructs, because they require coordination from the Windows operating system itself.
+Benefits:
+
+- When a kernel-mode construct detects contention on a resource, Windows blocks the losing thread sos that it is not
+  spinning on a CPU, wasting processor resources
+- Kernel-mode constructs can synchronize native and managed threads with each other.
+- Kernel-mode constructs can synchronize threads running in different processes on the same machine.
+- Kernel-mode constructs can have security applied to them to prevent unauthorized accounts from accessing them.
+- A thread can block until all kernel-mode constructs in a set are available or until any one kernel-mode construct
+  in a set has become available.
+- A thread can block on a kernel-mode construct specifying a timeout value; if the thread can't have access to th
+  resource it wants in the specified amount of time, then the thread is unblocked and can perform other tasks.
+
+#### Semaphore constructs
+
+Semaphores are simply Int32 variables maintained by the kernel. A thread waiting on a semaphore blocks when the
+semaphore is 0 and unblocks when the semaphore is > 0. When a thread waiting on a semaphore unblocks, the kernel
+automatically subtracts 1 from the semaphore's count.
+The behaviour of semaphore:
+
+- When multiple threads are waiting on an auto-reset event, setting the event causes only one thread to become
+  unblocked.
+- When multiple threads are waiting on a manual-reset event, setting the event causes all threads to become unblocked.
+- When multiple threads are waiting on a semaphore, releasing the semaphore causes releaseCount threads to become
+  unblocked (where releaseCount is the argument passed to Semaphore's Release method)
+
+#### Mutex Constructs
+
+A Mutex represents a mutual-exclusive lock. Works similar to AutoResetEvent or a Semaphore with a count of 1 because
+all three constructs release only one waiting thread at a time.
+
+- Mutex objects record which thread obtained it by querying the calling thread's Int32 ID.
+- Mutex makes sure that the calling thread is the same thread that obtained the Mutex.
+- Mutex objects maintain a recursion count indicating how many times the owning thread owns the Mutex.
+
 [Back to top ⇧](#threading)
 
 ## Hybrid Thread Synchronization Constructs
