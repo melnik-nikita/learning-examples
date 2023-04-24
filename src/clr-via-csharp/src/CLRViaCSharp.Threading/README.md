@@ -407,4 +407,294 @@ all three constructs release only one waiting thread at a time.
 
 ## Hybrid Thread Synchronization Constructs
 
+Hybrid Thread Synchronization Constructs are built by combining the user-mode and kernel-mode constructs.
+
+Hybrid constructs provide the performance benefit of the primitive user-mode constructs when there is no thread
+contention. Also use the primitive kernel mode constructs to provide the benefit of not spinning (wasting CPU time)
+when multiple threads are contending (contend - "бороться/соперничать") for the construct at the same time.
+
+#### A Simple Hybrid lock example
+
+```c#
+internal sealed class SimpleHybridLock : IDisposable
+{
+    // The Int32 is used by the primitive user-mode constructs (Interlocked methods)
+    private Int32 _waiters = 0;
+
+    // The AutoResetEvent is the primitive kernel-mode construct
+    private readonly AutoResetEvent _waiterLock = new (false);
+
+    public void Enter()
+    {
+        // Indicate that this thread wants the lock
+        if (Interlocked.Increment(ref _waiters) == 1)
+        {
+            return; // Lock was free, no contention, just return
+        }
+
+        // Another thread was the lock (contention), make this thread wait
+        _waiterLock.WaitOne(); // Bad performance hit here
+    }
+
+    public void Leave()
+    {
+        // This thread is releasing the lock
+        if (Interlocked.Decrement(ref _waiters) == 0)
+        {
+            return; // No other threads are waiting, just return
+        }
+
+        // Other threads are waiting, wake 1 of them
+        _waiterLock.Set(); // Bad performance hit here
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _waiterLock.Dispose();
+    }
+}
+```
+
+#### Lock that offers spinning, thread ownership, and recursion
+
+```c#
+internal sealed class AnotherHybridLock : IDisposable
+{
+    // The Int32 is used by the primitive user-mode constructs (Interlocked methods)
+    private Int32 _waiters = 0;
+
+    // The AutoResetEvent is the primitive kernel-mode construct
+    private readonly AutoResetEvent _waiterLock = new (false);
+
+    // This field controls spinning in an effort to improve performance
+    private readonly Int32 _spinCount = 4000; // Arbitrarily chosen count
+
+    // These fields indicate which thread owns the lock and how many times it owns it
+    private Int32 _owningThreadId = 0;
+    private Int32 _recursion = 0;
+
+    public void Enter()
+    {
+        // If calling thread already owns the lock, increment recursion count and return
+        var threadId = Thread.CurrentThread.ManagedThreadId;
+
+        if (threadId == _owningThreadId)
+        {
+            _recursion++;
+            return;
+        }
+
+        // The calling thread doesn't own the lock, try to get it
+        var spinWait = new SpinWait();
+        for (var spinCount = 0; spinCount < _spinCount; spinCount++)
+        {
+            // If the lock was free, this thread  got it; set some state and return
+            if (Interlocked.CompareExchange(ref _waiters, 1, 0) == 0)
+            {
+                goto GotLock;
+            }
+
+            // Black magic: give other threads a chance to run
+            // in hopes that the lock will be released
+            spinWait.SpinOnce();
+        }
+
+        // Spinning is over and the lock was still not obtained, try one more time
+        if (Interlocked.Increment(ref _waiters) > 1)
+        {
+            // Still contention, this thread must wait
+            _waiterLock.WaitOne(); // Wait for the lock; performance hit
+            // When this thread wakes, it owns the lock; set some state and return
+        }
+
+        GotLock:
+        // when a thread gets the lock, we record its ID and
+        // Indicate that the thread owns the lock once
+        _owningThreadId = threadId;
+        _recursion = 1;
+    }
+
+    public void Leave()
+    {
+        // if the calling thread doesn't own the lock, there is a bug
+        var threadId = Thread.CurrentThread.ManagedThreadId;
+        if (threadId != _owningThreadId)
+        {
+            throw new SynchronizationLockException("Lock not owned by calling thread");
+        }
+
+        // Decrement the recursion count. If this thread still owns the lock just return
+        if (--_recursion > 0)
+        {
+            return;
+        }
+
+        _owningThreadId = 0; // No thread owns the lock now
+
+        // If no other threads are waiting, just return
+        if (Interlocked.Decrement(ref _waiters) == 0)
+        {
+            return;
+        }
+
+        // Other threads are waiting, wake 1 of them
+        _waiterLock.Set(); // Bad performance hit
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        _waiterLock.Dispose();
+    }
+}
+```
+
+### Hybrid Constructs in the Framework Class Library
+
+#### The ManualResetEventSlim and SemaphoreSlim classes
+
+Work exactly like their kernel-mode counterparts, except that both employ spinning in user mode, and they both defer
+creating the kernel-mode construct until the first time contention occurs.
+
+#### The Monitor class and sync blocks
+
+Most used (as it has been around the longest) hybrid thread synchronization construct, which provides a
+mutual-exclusive lock support spinning, thread ownership, and recursion.
+
+Below image shows the relationship between objects in the heap, their sync block indexes, and elements in the CLR's
+sync block array
+
+![](../../img/objects-in-the-heap-sync-blocks.png "Objects in the heap")
+
+List of ___Monitor___ class problems:
+
+- A variable can refer to a proxy object if the type of object is refers to is derived from the System.
+  MarshalByRefObject class. When you call ___Monitor___'s method, passing a reference to a proxy object, you are locking
+  the proxy object, not the actual object that the proxy refers to.
+- If a thread calls ___Monitor.Enter___, passing it a reference to a type object that has been loaded domain neutral,
+  the thread is taking a lock on that type across all AppDomains in the process.
+- Because strings can be interned, two completely separate pieces of code could unknowingly get references to a
+  single ___String___ object in memory.
+- When passing a string across an AppDomain boundary, the CLR does not make a copy of the string; instead, it simply
+  passes a reference to the string into the other AppDomain. This improves performance, however ___String___ objects
+  have ___sync block___ index associated with them, which is mutable, and this allows threads in different
+  AppDomains to synchronize with each other unknowingly. So, the recommendation is to never pass ___String___
+  references to ___Monitor___'s method
+- Because ___Monitor___'s methods take an Object, passing a value type causes the value type to get boxed, resulting
+  in the thread taking a lock on the boxed object. Each time ___Monitor.Enter___ is called, the lock is taken on a
+  completely different object and you get no thread synchronization at all
+- Applying ___[MethodImpl(MethodImplOptions.Synchronized)]___ attribute to a method causes the JIT compiler to
+  surround the method's native code with calls to ___Monitor.Enter___ and ___Monitor.Exit___. If the method is an
+  instance method, then ___this___ is passed to these methods, locking the implicitly public lock. If the method is
+  static, then a reference to the type's type object is passed to these methods, potentially locking a
+  domain-neutral type. The recommendation is to never use this attribute.
+- When calling a type's type constructor, the CLR takes a lock on the type's type object to ensure that only one
+  thread initializes the type object and its static fields. Again, this type could be loaded domain neutral, causing
+  a problem. The recommendation ois to avoid type constructors as much as possible or least keep them short and simple.
+
+```c#
+private void SomeMethod()
+{
+    lock(this) {
+        // this code has exclusive access to the data...
+    }
+}
+```
+
+equal to
+
+```c#
+private void SomeMethod()
+{
+    Boolean lockTaken = false;
+    try {
+        // An exception (such as ThreadAbortException) could occur here...
+        Monitor.Enter(this, ref lockTaken);
+        // this code has exclusive access to the data...
+    }
+    finally {
+        if (lockTaken){
+            Monitor.Exit(this);
+        }
+    }
+}
+```
+
+The recommendation is not to use C#'s ___lock___ statement
+
+#### The ReaderWriterLockSlim class
+
+The ___ReaderWriterLockSlim___ encapsulates logic to solve such problems:
+
+- When one thread is writing to the data, all other threads requesting access are blocked
+- When one thread is reading from the data, other threads requesting read access are allowed to continue executing,
+  but threads requesting write access are blocked
+- When a thread writing to the data has completed, either a single writer thread is unblocked so it can access the
+  data or all the reader threads are unblocked so that all of them can access the data concurrently. If no threads
+  are blocked, the the lock is free and available for the next reader or writer thread that wants it.
+- When all threads reading from the data have completed, a single writer thread is unblocked so it can access the
+  data. If no threads are blocked, then the lock is free and available for the next reader or writer thread that
+  wants it.
+
+```c#
+internal class ReadWriteLockSlimTransaction : IDisposable
+{
+    private readonly ReaderWriterLockSlim _lock = new (LockRecursionPolicy.NoRecursion);
+    private DateTime _timeOfLastTransaction;
+
+    public void PerformTransaction()
+    {
+        _lock.EnterWriteLock();
+        // This code has exclusive access to the data...
+        _timeOfLastTransaction = DateTime.Now;
+        _lock.ExitWriteLock();
+    }
+
+    public DateTime LastTransaction
+    {
+        get
+        {
+            _lock.EnterReadLock();
+            // This code has shared access to the data...
+            var temp = _timeOfLastTransaction;
+            _lock.ExitReadLock();
+            return temp;
+        }
+    }
+
+    
+}
+```
+
+#### The OneManyLock class
+
+Is a faster implementation of ReaderWriterLockSlim by Jeffrey Richter
+
+#### The CountdownEvent class
+
+This construct blocks a thread until its internal counter reaches 0. After ___CountdownEvent___'s CurrentCount
+reaches 0, it cannot be changed.
+
+#### The Barrier class
+
+___Barrier___ is used to control a set of threads that are working together in parallel so that they can step
+through phases of the algorithm together.
+
+### Asynchronous Synchronization
+
+Tasks have many advantages over constructs shown above:
+
+- Tasks use much less memory that threads and they take much less time to create and destroy
+- The thread pool automatically scales the tasks across available CPUs
+- As each task completes a phase, the thread running that task goes back to the thread pool, where it can do other
+  work, if any is available for it
+- the thread pool has a process-global view of tasks and, as such, it can better schedule these tasks, reducing the
+  number of threads in the process and also reducing context switching
+
+The ___SemaphoreSlim___ is used to synchronize async operations. Usually, you need to create the ___SemaphoreSlim___
+with a maximum count of 1, which gives you mutual-exclusive access to the resource that the ___SemaphoreSlim___
+protects. This is similar to the behavior you get using ___Monitor___, except that ___SemaphoreSlim___ does not
+offer thread ownership and recursion semantics (which is good).
+
 [Back to top ⇧](#threading)
