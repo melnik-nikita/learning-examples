@@ -1,4 +1,4 @@
-# CLR via C# book code examples
+# [CLR via C# book code examples](../../README.md)
 
 ### [Part I: CLR Basics](./src/CLRViaCSharp.CLRBasics/README.md)
 

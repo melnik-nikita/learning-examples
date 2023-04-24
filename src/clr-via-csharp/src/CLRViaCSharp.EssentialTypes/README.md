@@ -1,4 +1,4 @@
-﻿# Essential Types
+﻿# [Essential Types](../../README.md)
 
 # Chars, Strings and working with text
 
