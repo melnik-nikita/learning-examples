@@ -76,7 +76,7 @@ Expression<Func<int, int, int>> adder1 = Expression.Lambda<Func<int, int, int>>(
 
 Only expression-bodied lambda expressions can be converted to expression trees.
 
-## Extension methods
+### Extension methods
 
 ```csharp
 namespace NodaTime.Extensions;
@@ -199,9 +199,9 @@ None of the parameters in an async method can use the __out__ or __ref__ modifie
 - Avoid mixing synchronous and asynchronous code
 - Allow cancellation whenever possible
 
-## Async implementation
+### Async implementation
 
-### The structure of the generated code
+#### The structure of the generated code
 
 The implementation of async code is in the form of a __state machine__.
 The compiler will generate a private nested struct to represent the asynchronous method,
@@ -330,7 +330,8 @@ label_9:
 
 ![Flowchart of an async method](../../img/flow-chart-of-an-async-method.png "Flowchart of an async method")
 
-## C# 5 bonus features
+### C# 5 bonus features
 
-### Capturing variables in foreach loop
+#### Capturing variables in foreach loop
 
+[Back to top ⇧](#c-25)
