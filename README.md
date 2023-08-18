@@ -2,3 +2,4 @@
 
 ## [CLR via C#](./src/clr-via-csharp/README.md)
 
+## [C# in Depth](./src/csharp-in-depth/README.md)
