@@ -1,6 +1,14 @@
 # [C# 6](../../README.md)
 
 1. [Super-sleek properties and expression-bodied members](#super-sleek-properties-and-expression-bodied-members)
+    - Upgrades to automatically implemented properties
+    - Expression-bodied members
+2. [Stringy features](#stringy-features)
+    - A recap of string formatting in .NET
+    - Introducing interpolated string literals
+    - Localization using FormattableString
+    - Uses, guidelines, and limitation
+    - Accessing identifiers with nameof
 
 ## Super-sleek properties and expression-bodied members
 
@@ -185,3 +193,166 @@ In C# 6 you can't have expression-bodied:
 
 [Back to top ⇧](#c-6)
 
+## Stringy features
+
+### A recap of string formatting in .NET
+
+```csharp
+Console.Write("What's your name? ");
+stirng name = Console.ReadLine();
+Console.WriteLine("Hello, {0}!", name);
+```
+
+### Introducing interpolated string literals
+
+```csharp
+Console.Write("What's your name? ");
+stirng name = Console.ReadLine();
+Console.WriteLine($"Hello, {name}!"); // interpolated string
+
+decimal price = 95.25m;
+decimal tip = price * 0.2m;
+// Right-justify prices using nine-digit alignment
+Console.WriteLine($"Price: {price,9:C}");
+Console.WriteLine($"Tip: {tip,9:C}");
+Console.WriteLine($"Total: {price + tip,9:C}");
+```
+
+#### Verbatim string literals
+
+They start with ___@___ before the double quote. Within a verbatim string literal, backslashes and line breaks are
+included in the string.
+Typically used for:
+
+- Strings breaking over multiple lines
+- Regular expressions (which use backslashes for escaping, quite separate from the escaping the C# compiler uses in
+  regular string literal)
+- Hardcoded Windows filenames
+
+```csharp
+string sql = @"
+    SELECT City, ZipCode
+    FROM Address
+    WHERE Country = 'US'";
+Regex lettersDotDigits = new Regex(@"[a-z]+\.\d+");
+string file = @"c:users\skeet\Test\Test.cs";
+```
+
+Verbatim string literals also can be interpolated
+
+```csharp
+decimal price = 95.25m;
+decimal tip = price * 0.2m;
+// Right-justify prices using nine-digit alignment
+Console.WriteLine(@$"Price: {price,9:C}
+Tip: {tip,9:C}
+Total: {price + tip,9:C}");
+```
+
+#### Compiler handling of interpolated string literals (part 1)
+
+Compiler converts the interpolated string literal into a call to ___string.Format___, and it extracts the expressions
+form the format items and passes them as arguments after the composite format string.
+
+```csharp
+int x = 10, y = 10;
+string text = $"x={x}, y={y}"; // converted to string.Format("x={0}, y={1}", x, y);
+```
+
+### Localization using FormattableString
+
+To perform formatting in a specific culture, you need three pieces of information:
+
+- The composite format string, which includes the hardcoded text and the format items as placeholders for the real
+  values
+- The values themselves
+- The culture you want to format the string in
+
+The ___FormattableString___ class in the System namespace helps to specify the culture
+
+```csharp
+var dateOfBirth = new DateTime(1976, 6, 19);
+FormattableString formattableString = $"Jon was born on {dateOfBirth:d}"; // Keeps the compoite format string and value in a FormattableString
+var culture = CultureInfo.GetCultureInfo("en-US");
+var result = formattableString.ToString(culture); // Format in the specified culture
+```
+
+#### Compiler handling of interpolated string literals (part 2)
+
+When the compiler needs to convert an interpolated string literal into a ___FormattableString___, it performs most of
+the same steps as for a conversion to ___string___. But instead of ___string.Format___, it calls the static ___Create___
+method on the ___FormattableStringFactory___ class.
+
+```csharp
+int x = 10, y = 20;
+FormattableString = formattable = FormattableStringFactory.Create("x={0}, y={1}, x, y);
+```
+
+### Uses, guidelines, and limitation
+
+Should be used:
+
+- Developers and machines, but maybe not end users
+    - Machine readable strings
+    - Messages for other developers
+    - Messages for end users
+- Hard limitation of interpolated string literals
+    - No dynamic formatting
+    - No expression reevaluation
+    - No bare colons
+- When you can but really shouldn't
+    - Defer formatting for strings that may not be used
+    - Format for readability
+
+### Accessing identifiers with nameof
+
+___nameof___ operator takes an expression referring to a member or local variable, and the result is a compile-time
+constant string with the simple name for that member or variable.
+
+Common uses of ___nameof___:
+
+- Argument validation
+    ```csharp
+    public void Test(string someArgument) {
+        Preconditions.CheckNotNull(someArgument, nameof(someArgument));
+    }
+    ```
+- Property change notification for computed properties
+    ```csharp
+    public class Rectangle : INotifyPropertyChanged
+    {
+        private double weight, height;
+  
+        public event PropertyChangedEventHandler PropertyChanged;
+  
+        public double Width
+        {
+            get { return width; }
+            set
+            {
+                if (width == value) return;
+                
+                width = value;
+                RaisePropertyChanged(); // Raises the event for the Width property
+                RisePropertyChanged(nameof(Area)); // Raises the event for the Area property
+            }
+        }
+        public double Height { ... }
+        public double Area => Width * Height;
+  
+        private void RaisePropertyChanged([CallerMemberName] string propertyName = null) { ... }
+    }
+    ```
+- Attributes
+    ```csharp
+    public class Rectangle : INotifyPropertyChanged
+    {
+        ...
+        [DerivedProperty(nameof(Area))
+        public double Width { ... }
+        ...
+    }
+    ```
+
+[Back to top ⇧](#c-6)
+[Back to top ⇧](#c-6)
