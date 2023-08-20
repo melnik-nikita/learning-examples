@@ -9,6 +9,11 @@
     - Localization using FormattableString
     - Uses, guidelines, and limitation
     - Accessing identifiers with nameof
+3. [A smörgåsbord of features for concise code](#a-smörgåsbord-шведский-стол-of-features-for-concise-code)
+    - Using static directives
+    - Object and collection initializer enhancements
+    - The null conditional operator
+    - Exception filters
 
 ## Super-sleek properties and expression-bodied members
 
@@ -355,4 +360,58 @@ Common uses of ___nameof___:
     ```
 
 [Back to top ⇧](#c-6)
+
+## A smörgåsbord (шведский стол) of features for concise code
+
+### Using static directives
+
+__using static *type-name-or-alias*;__
+Using static allows to use following members directly by using their simple names:
+
+- Static fields and properties
+- Static methods
+- Enum values
+- Nested types
+
+```csharp
+using static System.Math;
+// Methods and properties
+static Point PolarToCartesian(double degrees, double magnitude) {
+    double radians = degrees * PI / 180;
+    return new Point(Cos(radians) * magnitude, Sin(radians) * magnitude);
+}
+// Enum Values
+using static System.Reflection.BindingFlags;
+    ...
+var fields = type.GetFields(Instance | Static | Public | NonPublic);
+```
+
+### Object and collection initializer enhancements
+
+### The null conditional operator
+
+When a null conditional operator is encountered, the compiler injects a nullity check on the value to the left of the ?.
+
+```csharp
+var readingCustomers = allCustomers.Where(
+    c => c.Profile != null &&
+        c.Profile.DefaultShippingAddress != null &&
+        c.Profile.DefaultShippingAddress.Town == "Reading");
+// now can be written as
+var readingCustomers = allCustomers.Where(
+    c => c.Profile?.DefaultShippingAddress?.Town == "Reading");
+    
+// Accessing indexers
+int[] array = null;
+int? firstElement = array?[0];
+```
+
+### Exception filters
+
+```csharp
+try { ... }
+// catches only connection failures
+catch (WebException we) when (we.Status == WebExceptionStatus.ConnectFailure) { ... }
+```
+
 [Back to top ⇧](#c-6)
