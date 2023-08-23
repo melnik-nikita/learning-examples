@@ -1,6 +1,7 @@
 # [C# 7 and beyond](../../README.md)
 
 1. [Composition using tuples](#composition-using-tuples)
+2. [Deconstruction and pattern matching](#deconstruction-and-pattern-matching)
 
 ## Composition using tuples
 
@@ -106,5 +107,150 @@ t1.Item2 != t2.Item2 &&
 t1.Item3 != t2.Item3;
 */
 ```
+
+[Back to top ⇧](#c-7-and-beyond)
+
+## Deconstruction and pattern matching
+
+### Deconstructing tuples into multiple variables
+
+```csharp
+var tuple = (10, "text");
+// Deconstruct tuple to new variables a, b implicitly
+var (a, b) = tuple;
+// Deconstruct tuple to new variables c, d explicitly
+(int c, string d) = tuple;
+// Deconstruct tuple to existing variables
+int e;
+string f;
+(e, f) = tuple;
+// Using discards
+var tuple = (1, 2, 3, 4);
+var (x, y, _, _) = tuple;
+Console.WriteLine(_); // the name '_' does ot exist in the current context
+```
+
+### Deconstructing nontuple types
+
+__Instance deconstruction methods__
+Rules:
+
+- the method should be accessible to the code doing the deconstruction.
+- it must be a _void_ method
+- there must be at least two parameters
+- it must be nongeneric
+
+```csharp
+internal class Point {
+    public double X {get; set;}
+    public double Y {get; set;}
+    ...
+    public void Deconstruct(out double x, out douoble y) {
+        x = X;
+        y = Y;
+    }
+}
+
+// Usage
+var point = new Point(1.5, 20);
+var (x, y) = point;
+```
+
+### Pattern matching in C# 7
+
+The basic idea of pattern matching is to test a certain aspect of a value and use the result of that test to perform
+another action.
+
+```csharp
+static double Perimeter(Shape shape)
+{
+    switch (shape)
+    {
+        case null:
+            throw new ArgumentNullException(nameof(shape));
+        case Rectangle rect:
+            return 2 * (rect.Height + rect.Width);
+        case Circle circle:
+            return 2 * PI * circle.Radius;
+        case Triangle tri:
+            return tri.SideA + tri.SideB + tri.SideC;
+        default:
+            throw new ArugmentException(...);
+    }
+}
+```
+
+### Using the three kinds of patterns introduced in C# 7
+
+Three kinds of patterns in C# 7:
+
+- Constant patterns
+- Type patterns
+- The __var__ pattern
+
+#### Constant pattern
+
+The pattern consists entirely of a compile-time constant expression, which is then checked for equality with input.
+
+```csharp
+static void Match(object input)
+{
+    if (input is "hello")
+        WriteLine("Input is string hello");
+    else if (input is 5L)
+        WriteLine("Input is long 5");
+    else if (input is 10)
+        WriteLine("Input is int 10");
+    else
+        WriteLine("Input didn't match hello, long 5 or int 10");
+}
+```
+
+#### Type patterns
+
+A ___type pattern___ consists of a type and an identifier - a bit like a variable declaration.
+
+```csharp
+static double Perimeter(Shape shape)
+{
+    if (shape == null)
+        throw new ArgumentNullException(nameof(shape));
+    if (shape is Rectangle rect)
+        return 2 * (rect.Height + rect.Width);
+    if (shape is  Circle circle)
+        return 2 * PI * circle.Radius;
+    if (shape is  Triangle tri)
+        return tri.SideA + tri.SideB + tri.SideC;
+    
+    throw new ArugmentException(...);
+}
+```
+
+#### The ___var___ pattern
+
+The ___var___ pattern looks like a type pattern but using ___var___ as the type, so it's just ___var___ followed by
+identifier:
+___someExpression is var x___
+Unlike type patterns it doesn't test anything. It always matches, resulting in a new variable with the same compile-time
+type as __input__, with the same value as __input__
+
+```csharp
+static double Perimeter(Shape shape)
+{
+    switch (shape ?? CreateRandomShape())
+    {
+        case Rectangle rect:
+            return 2 * (rect.Height + rect.Width);
+        case Circle circle:
+            return 2 * PI * circle.Radius;
+        case Triangle tri:
+            return tri.SideA + tri.SideB + tri.SideC;
+        case var actualShape:
+            throw new InvaidOperationException($"Shape type {actualShape.GetType()} perimeter unknown");
+    }
+}
+```
+
+
 
 [Back to top ⇧](#c-7-and-beyond)
