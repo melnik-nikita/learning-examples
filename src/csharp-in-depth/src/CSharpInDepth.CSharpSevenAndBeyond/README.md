@@ -2,6 +2,7 @@
 
 1. [Composition using tuples](#composition-using-tuples)
 2. [Deconstruction and pattern matching](#deconstruction-and-pattern-matching)
+3. [Improving efficiency with more pass by reference](#improving-efficiency-with-more-pass-by-reference)
 
 ## Composition using tuples
 
@@ -251,6 +252,201 @@ static double Perimeter(Shape shape)
 }
 ```
 
+[Back to top ⇧](#c-7-and-beyond)
 
+## Improving efficiency with more pass by reference
+
+### ___Ref___ locals and ___ref___ returns
+
+#### Ref locals
+
+Ref local allows to declare a new local variable that shares the same data as an existing one (by reference).
+
+```csharp
+int x = 10;
+ref int y = ref x;
+x++;
+y++;
+WriteLine(x); // 12
+
+// Modify array elements
+var array = new (int x, int y)[10];
+for (int i = 0; i < arrray.Length; i++) {
+    array[i] = (i, i);
+}
+for (int i = 0; i < arrray.Length; i++) {
+    // For each element of the array, increments x and doubles y
+    ref var elements = ref array[i];
+    element.x++;
+    element.y *= 2;
+}
+```
+
+Limitations:
+
+- Ref locals have to be initialized at the point of declaration
+- No ref fields, or local variables that would live beyond the method call
+- No references to read-only variables
+- Types: only identity conversions are permitted
+
+#### Ref returns
+
+Reference return values (or ref returns) are values that a method returns by reference to the caller.
+
+```csharp
+static void Main() {
+    int x  = 10;
+    ref int y = ref RefReturn(ref x);
+    y++;
+    WriteLine(x); // 11
+}
+static ref int RefReturn(ref int p) {
+    return ref p;
+}
+```
+
+A method can't return a storage location that was created on the stack, because when the stack is popped, the storage
+location won't be valid anymore.
+
+Valid cases:
+
+- __ref__ or __out__ parameters
+- Fields of reference types
+- Fields of struct where the struct variable is a __ref__ or __out__ parameter
+- Array elements
+
+Invalid cases:
+
+- Local variables declared in the method (including value parameters)
+- Fields of struct variables declared in the method
+
+#### Ref readonly
+
+Ref readonly allows to alias a read-only field for the sake of efficiency to avoid copying and allows read-only access
+via the ref variable.
+
+```csharp
+static readonly int field = DateTIme.UtcNow.Second;
+static ref readonly int GetFieldAlias() => ref field;
+
+static void Main() {
+    ref readonly int local = ref GetFieldAlis();
+    WriteLine(local);
+}
+```
+
+### in parameters
+
+When a parameter has the __in__ modifier, the intention is that the method won't change the parameter value, so a
+variable can be passed by reference to avoid copying. The caller does not have to specify the __in__ modifier for the
+argument.
+
+```csharp
+static void PrintDateTime(in DateTime value) { // method declaration with in parameter
+    string text = value.ToString("yyy-MM-dd'T'HH:mm:ss", CultureInfo.InvariantCulture);
+    WriteLine(text);
+}
+static void Main() {
+    DateTime start = DateTime.UtcNow;
+    PrintDateTime(start); // variable is passed by reference implicitly
+    PrintDateTime(in start); // variable is passed by reference explicitly
+    PrintDateTime(start.AddMinutes(1)); // Result is copied to hidden local variable, which is passed by reference
+    PrintDateTime(in start.AddMinutes(1)); // Compile-time error: argument can't be passed by reference
+```
+
+### Declaring structs as readonly
+
+You use the readonly modifier to declare that a structure type is immutable. All data members of a readonly struct must
+be read-only as follows:
+
+- Any field declaration must have the readonly modifier
+- Any property, including auto-implemented ones, must be read-only. In C# 9.0 and later, a property may have an init
+  accessor.
+
+```csharp
+public readonly struct YearMonthDay {
+    public int Year {get;}
+    public int Month {get;}
+    public int Day {get;}
+    
+    public YearMonthDay(int year, int month, int day) => (Year, Month, Day) = (year, month, day);
+}
+```
+
+### Extension methods with __ref__ or __in__ parameters
+
+```csharp
+public readonly struct Vector3D
+{
+    public double X {get;}
+    public double Y {get;}
+    public double Z {get;}
+    public Vector3D(double x, double y, double z) => (X, Y, Z) = (x, y, z)
+}
+
+public static double Magnitude(this in Vector3D vec) =>
+    Math.Sqrt(vec.X * vec.X + vec.Y * vec.Y + vec.Z * vec.Z);
+public static void OffsetBy(this ref Vector3D orig, in Vector3D off) =>
+    orig = new Vector3D(orig.X + off.X, orig.Y + off.Y, orig.Z + off.Z);
+
+var vector = new Vector3D(1.5, 2.0, 3.0);
+var offset = new Vector3D(5.0, 2.5, -1.0);
+
+vector.OffsetBy(offset);
+WriteLine($"({vector.X}, {vector.Y}, {vector.Z})");
+WriteLine(vector.Magnitude());
+/*
+    Output:
+    (6.5, 4.5, 2)
+    8.15475321515004
+*/
+
+ref readonly var alias = ref vector;
+alias.OffsetBy(offset); // Error: trying to use a read-only variable as ref
+```
+
+### Ref-like structs
+
+A ref-like struct value must sty on the stack, always.
+
+```csharp
+public ref struct RefLikeStruct { ... }
+```
+
+Things, that can't be done with ref-like structs:
+
+- Can't include as a field of any type that isn't also a ref-like struct
+- Can't be boxed
+- Can't use as a type argument for any generic method or type, including as a type argument for a generic ref0like
+  struct type.
+- Can't use as the operand for the ___typeof___ operator
+- Local variables can't be used anywhere the compiler might need to capture them on the heap in a special generated type
+    - async methods - variable can be declared and used between await expressions, so long as it was never used cross an
+      await expressions (with declaration before the await and usage after it)
+    - iterator blocks - same rules as for async
+    - any local variable captured by a local method, LINQ query expression, anonymous method or lambda expression
+
+#### Span<T> and stackalloc
+
+___Span<T>___ s a ref-like struct that provides read/write, indexed access to a section of memory ust like an array but
+without any concept of owning that memory. A span is always created from something else.
+
+```csharp
+static string Generate(string alphabet, Random random, int length) {
+    // Heap allocation
+    char[] chars = new char[length];
+    // Alternative without heap allocation
+    Span<char> chars = stackallock char[length];
+    for (int i = 0; i < length; i++)
+    {
+    chars[i] = alphabet[random.Next(alphabet.Length)];
+    }
+    return new string(chars);
+}
+
+string alphabet = "abcdefghijklmnopqrstuvwxyz";
+Random random = new Random();
+Console.WriteLine(Generate(alphabet, random, 10));
+```
 
 [Back to top ⇧](#c-7-and-beyond)
