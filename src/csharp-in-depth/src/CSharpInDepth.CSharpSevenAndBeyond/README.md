@@ -3,6 +3,8 @@
 1. [Composition using tuples](#composition-using-tuples)
 2. [Deconstruction and pattern matching](#deconstruction-and-pattern-matching)
 3. [Improving efficiency with more pass by reference](#improving-efficiency-with-more-pass-by-reference)
+4. [Concise code in C# 7](#concise-code-in-c-7)
+5. [C# 8 and beyond](#c-8-and-beyond)
 
 ## Composition using tuples
 
@@ -448,5 +450,200 @@ string alphabet = "abcdefghijklmnopqrstuvwxyz";
 Random random = new Random();
 Console.WriteLine(Generate(alphabet, random, 10));
 ```
+
+[Back to top ⇧](#c-7-and-beyond)
+
+## Concise code in C# 7
+
+### Local methods
+
+```csharp
+static void Main() {
+    int x = 10;
+    PrintAndIncrementX();
+    PrintAndIncrementX();
+    WriteLine($"After calls, x = {x}");
+    
+    void PrintAndIncrementX() {
+        WriteLine($"x = {x}");
+        x++;
+    }
+}
+```
+
+Local method restrictions:
+
+- can't have any access modifiers
+- can't have the ___extern___, ___virtual___, ___new___, ___override___, ___static___, or ___abstract___ modifiers
+- cant' have any attributes applied to it
+- can't have the same name as another local method within the same parent; there's no way to overload local methods
+
+#### Variable access within local methods
+
+- A local method can capture nly variables that are in scope
+- A local method must be declared after the declaration of any variables it captures
+- A local method can't capture ref parameters of the enclosing method
+- Local methods interact with definite assignment
+    - If a method that reads a captured variable is called before it's definitely assigned, that causes a compile-time
+      error
+    - If a local method writes to a captured variable in all possible execution flows, the variable will be definitely
+      assigned at the end of any call to that method
+- Local methods can't assign read-only fields
+
+### Out variables
+
+Inline variable declarations for out parameters: allows new variables to be declared within the method invocation
+itself.
+
+```csharp
+int value;
+// Before
+int.TryParse(text, out value);
+// After
+int.TryParse(text, out int value);
+```
+
+### Improvements to numeric literals
+
+#### Binary integer literals
+
+C# 7 extends binary literals, now they can use a prefix of __0b__ or __0B__.
+This is useful when implementing a protocol with specific bit patterns for a certain values.
+
+```csharp
+byte b1 = 135;
+byte b2 = 0x83;
+byte b3 = 0b10000111; // new addition, and more convenient to detect which bits are set
+```
+
+#### Underscore separators
+
+```csharp
+byte b1 = 135;
+byte b2 = 0x83;
+byte b3 = 0b10000111;
+byte b3 = 0b1000_0111;
+int maxInt32 = 2_147_483_647;
+decimal largeSalary = 123_456_789.12m;
+ulong alternatingBytes = 0xff_00_ff_00_ff_00_ff_00;
+ulong alternatingWords = 0xffff_0000_ffff_0000;
+ulong alternatingDwords = 0xffffffff_00000000;
+```
+
+Restrictions:
+
+- you can't put an underscore at the start of the literal.
+- you can't put an underscore at the end of the literal (including just before the suffix).
+- you can't put an underscore directly before or after the period in a floating-point literal.
+
+### Throw expressions
+
+___Throw expression___ can be used in a limited set of contexts:
+
+- As the body of a lambda expression
+- As the body of an expression-bodied member
+- As the second operand of the ?? operator
+- As the second or third operand of the conditional ?: operator (but not both in the same expression)
+
+```csharp
+// Expression-bodied method
+public void UnimplementedMethod() => throw new NotImplementedException();
+
+public void TestPredicateNeverCalledOnEmptySequence() {
+    // Lambda expression
+    int count = new string[0].Count(x => throw new exceptoioon("Band!"));
+    Assert.AreEquel(0, count);
+}
+
+// ?? operator (in expression-bodied method)
+public static T CheckNotNull<T>(T value, string paramName) where T : class
+    => value ?? thorw new ArgumentNullException(paramName);
+
+// ?: operator (in expression-bodied method)
+public static Name => initialized ? data["name"] : throw new Exceptoin(" ... ");
+```
+
+### Default literals
+
+```csharp
+// Before
+public async Task<string FetchValueAsync(
+    string key, CancellationToken cancellationToken = default(CancellationToken)) { ... }
+// After
+public async Task<string FetchValueAsync(
+    string key, CancellationToken cancellationToken = default) { ... }
+```
+
+### Nontrailing named arguments
+
+If there are any unnamed arguments after a named one, the named argument has to correspond to the same parameter as it
+would if it were a simple positional argument.
+
+```csharp
+// Before
+clientUploadCsv(table, null, csvData, options);
+// Or
+TableSchema schema = null;
+clientUploadCsv(table, schema, csvData, options);
+// After
+clientUploadCsv(table, schema: null, csvData, options);
+```
+
+### Private protected access
+
+You have access to a private protected member only from ode that's in the same assembly and is within a subclass of the
+member declaration (or is in the same type).
+
+### Minor improvements
+
+#### Generic type constraints
+
+__Enum__, __delegate__ and __unmanaged__ generic constraints have been added.
+
+```csharp
+static void EnumMethod<T>() where T : struct, Enum {}
+static void DelegateMethod<T> where T : Delegate {}
+static void UnmanagedMethod<T> where T : unmanaged {}
+```
+
+___Unmanaged___ type is a non-nullable, non-generic value type whose fields aren't reference types, recursively (Int32,
+Double, Decimal, Guid, etc).
+
+#### Overload resolution improvements
+
+Valid cases in C# 7.3
+
+- Generic type arguments must meet any constraint on the type parameters
+- Static methods can't be called as if they were instance methods
+- Instance methods can't be called as if they were static methods
+
+```csharp
+static void Method<T>(object x) where T : struct
+    => WriteLine($"{typeof(T)} is a struct");
+
+static void Method<T>(object x) where T : class
+    => WriteLine($"{typeof(T)} is a reference type");
+```
+
+#### Attributes for fields backing automatically implemented properties
+
+```csharp
+// Before:
+[Demo]
+private stirng name;
+public string Name
+{
+    get { return name; }
+    set { name = value; }
+}
+
+// After
+[field: Demo]
+public string Name {get;set;}
+```
+
+[Back to top ⇧](#c-7-and-beyond)
+
+## C# 8 and beyond
 
 [Back to top ⇧](#c-7-and-beyond)
