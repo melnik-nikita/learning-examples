@@ -8,11 +8,11 @@
 6. [Providing Access to Applications](#providing-access-to-applications)
 7. [Configuring Storage](#configuring-storage)
 8. [Decoupling Applications-Specific Information](#decoupling-application-specific-information)
-9. [Managing the Kubernetes API]()
+9. [Managing the Kubernetes API](#managing-the-kubernetes-api)
 10. [Running Kubernetes in Enterprise]()
 11. [Managing Kubernetes in Enterprise]()
-12. [Exploring Advanced Application Management Options]()
-13. [Troubleshooting Kubernetes]()
+12. [Exploring Advanced Application Management Options](#exploring-advanced-application-management-options)
+13. [Troubleshooting Kubernetes](#troubleshooting-kubernetes)
 
 ## Understanding Kubernetes and Cloud Native Computing
 
@@ -689,3 +689,198 @@ All Kubernetes API resources are well documented
 k explain deploy # list top level fields
 k explain deploy --recursive # list all fields recursive
 ```
+
+## Exploring Advanced Application Management Options
+
+Kubernetes offers different resource for running applications.
+
+- **The Deployment** is the default resource used to schedule replicated applications.
+- **The DaemonSet** is used to run one instance of an application on every node in the cluster.
+- **The StatefulSet** is used for stateful applications and provides guarantees about ordering and uniqueness of its
+  Pods.
+
+### Understanding DaemonSets
+
+You can find DaemonSet already used for agents on your cluster. Use **k get ds -A** for an overview. Otherwise, it is
+relatively easy to build a DaemonSet based on a Deployment. Notice that because of taints (the restrictions that are set
+to Nodes in the cluster), Pods may not be started on the control plane.
+
+```shell
+k create deploy daemon-nginx --image=nginx --dry-run=client -o yaml >> daemon-nginx.yaml
+# open file rename kind to DaemonSet, remove replicas, status and strategy.
+k create -f .\daemon-nginx.yaml
+k get ds,pods
+```
+
+### Understanding StatefulSet
+
+StatefulSet is useful when one of the following is required:
+
+- Stable, unique network identifiers
+- Stable, persistent storage
+- Ordered, graceful deployment and scaling
+- Ordered and automated rolling updates
+
+StatefulSet is commonly used for database applications.
+
+Limitations:
+
+- Storage must be provisioned by a PV.
+- Deleting a StatefulSet does not delete associated volumes
+- StatefulSets require a headless Service
+- It may be required to scale down the StatefulSet to 0 prior to deletion
+
+```shell
+k create -f .\statefulset.yaml
+k get statefulsets.apps,pods
+#NAME                   READY   AGE
+#statefulset.apps/web   0/3     11s
+#
+#NAME                     READY   STATUS    RESTARTS   AGE
+#pod/daemon-nginx-wz7n6   1/1     Running   0          17m
+#pod/daemon-nginx-x7kgr   1/1     Running   0          17m
+#pod/web-0                0/1     Pending   0          11s
+
+k get statefulsets.apps,pods
+#NAME                   READY   AGE
+#statefulset.apps/web   0/3     53s
+#
+#NAME                     READY   STATUS    RESTARTS   AGE
+#pod/daemon-nginx-wz7n6   1/1     Running   0          17m
+#pod/daemon-nginx-x7kgr   1/1     Running   0          17m
+#pod/web-0                0/1     Pending   0          53s
+
+# pod/web-0 is pending because yhe stateful set is missing a PVC:
+k describe pod web-0
+# Warning  FailedScheduling  65s   default-scheduler  0/2 nodes are available: pod has unbound immediate PersistentVolumeClaims. preemption: 0/2 nodes are available: 2 No preemption victims found for incoming pod..
+k create -f .\pv.yaml
+k get statefulsets.apps,pods # web-0 is running
+#NAME                   READY   AGE
+#statefulset.apps/web   1/3     5m54s
+#
+#NAME                     READY   STATUS    RESTARTS   AGE
+#pod/daemon-nginx-wz7n6   1/1     Running   0          22m
+#pod/daemon-nginx-x7kgr   1/1     Running   0          22m
+#pod/web-0                1/1     Running   0          5m54s
+```
+
+### Managing custom resources
+
+Being a cloud-native platform, Kubernetes uses API resources to store information in the cloud. The Kubernetes APIs are
+extensible, so that additional resource types can be added. Adding resource types makes Kubernetes more flexible, and
+allows specific properties to be stored in the configuration as well. An example is the Calico network plugin, which
+stores all of its features in the cloud.
+
+Kubernetes provides Custom Resource Definitions (CRDs) to add custom resources to the API. As an alternative, the APIs
+may also be created, but using CRDs makes it much easier. Notice that to provide full functionality, you'll often also
+need some running application to implement the features that that custom resource is adding.
+
+```shell
+# create api-resource
+k create -f .\crd-object.yaml
+#NAME                              SHORTNAMES          APIVERSION                             NAMESPACED   KIND
+#backups                           bks                 stable.example.com/v1                  true         BackUp
+k create -f .\crd-resource.yaml
+k get backup
+#NAME        AGE
+#my-backup   21s
+```
+
+### Installing Applications with Helm
+
+**Helm** is a package manager for Kubernetes. It may add CRDs as well as Pods and other cluster objects that implement
+the application. To do so, Helm charts implement YAML manifests that define the Kubernetes resources. Helm templates are
+added to the YAML manifests to allow for easy customization. Many Helm charts are provided
+through https://artifacthub.io
+To use Helm it should be installed first.
+
+```shell
+helm repo add softonic https://charts.softonic.io
+helm install my-hello-world-app softonic/hello-world-app --version 1.2.2
+```
+
+### Using Operators
+
+Kubernetes operators extend Kubernetes to run stateful applications natively on Kubernetes. Operators commonly come with
+Customer Resources to implement the requested functionality in the API. Operators come with a container image that
+implement the specific functionality. Operators are often installed using helm charts. Common operators exist for
+RabbitMQ, Prometheus, Apache Flink, and others applications.
+
+Helm vs Operators
+
+- Helm charts and operators can both be used to deploy apps.
+- Helm is more an installation tool, used to merge custom parameters in templates with the application code
+- Operators are focussing on running complex applications in Kubernetes
+- The difference between helm and operators is expressed as day 1 and day 2 functionality
+- Being a day 1 tool, helm is used to bring the cluster up and run applications in it
+- As a day 2 tool, operators are sued to manage complex applications
+
+## Troubleshooting Kubernetes
+
+### Troubleshooting Applications running in Pods
+
+Applications in Kubernetes are started through container images. While running in a container, the application has no
+access to a standard output or any lgs. To deal with this, Kubernetes redirects all the application sends to STDOUT or
+STDERR. Use **kubectl logs** to access output generated by thee application.
+
+```shell
+k run troubleshooting-k8s-db --image=mariadb
+k logs troubleshooting-k8s-db
+#2023-09-09 08:56:08+00:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:11.1.2+maria~ubu2204 started.
+#2023-09-09 08:56:08+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+#2023-09-09 08:56:08+00:00 [Note] [Entrypoint]: Entrypoint script for MariaDB Server 1:11.1.2+maria~ubu2204 started.
+#2023-09-09 08:56:08+00:00 [ERROR] [Entrypoint]: Database is uninitialized and password option is not specified
+#        You need to specify one of MARIADB_ROOT_PASSWORD, MARIADB_ROOT_PASSWORD_HASH, MARIADB_ALLOW_EMPTY_ROOT_PASSWORD and MARIADB_RANDOM_ROOT_PASSWORD
+```
+
+### Troubleshooting Pods and Other Objects
+
+When creating an application you would use **kubectl**. **Kubectl** is addressing **kube-apiserver**. ***kube-apiserver
+** will define resource in **Etcd**, if the resource is not in **Etcd** nothing is going to happen. If the resource is
+an application, it needs to be schedule, the **kube-scheduler** is responsible for that. **kube-scheduler** is another
+one of the core processes that is running on the controller node. The **kube-scheduler** is going to reach out to *
+*kublet** and from the **kubelet**, that is on the worker node, and that is where the application is actually started.
+So the **kubelet** receives an instruction and this instruction is "go fetch this container image" and the result is a
+running container image. Only once it arrives at the local node you get **image pull** and **cri** that is running your
+application.
+
+When the app in **Etcd** you can already troubleshoot application using **kubectl describe** command.
+To figure out what is happening between **kube-scheduler** and **kubelet**, the cluster events or **node logs** are
+used.
+If anything is wrong with image pull **kubectl describe** can be used.
+When app is running **kubectl logs** can be used for troubleshooting.
+
+So, the important from the above is the **kubectl describe** is available at the earliest stages of application process,
+and **kubectl logs** is only available once the CRI on the local worker node has started your application.
+
+![Troubleshooting Pods and Other Objects](./img/troubleshooting-pods-and-other-objects.png "Troubleshooting Pods and Other Objects")
+
+```shell
+k create deployment troubleshoot-busybox --image=busybox
+k get all --selector app=troubleshoot-busybox
+k describe pods troubleshoot-busybox-69887c9dfd-9q7mk
+```
+
+### Troubleshooting Networking Issues
+
+To access applications, Services are always required. Services connect to applications using selector labels: make sure
+they match. ClusterIP Services cannot be accessed from outside of the cluster. Ingress may be used for Http/HTTPS
+workloads. Alternatively, generic load balancers may also be used. For troubleshooting, use **kubectl port-forward** to
+access an application on a local port.
+
+### Troubleshooting Authentication and Authorization
+
+Kubernetes doesn't work with user accounts in the traditional sense. A Kubernetes user is a set of public/private keys
+defined in the ~/.kube/config file. If anything is wrong with it, you can regenerate the config from the cluster Control
+node /etc/kubernetes/admin.conf
+
+To access a Kubernetes cluster, you need to provide some information:
+
+- **cluster name**: the name of each cluster
+- **context**: the default namespace you want to connect to
+- **server** the name of the server a specific cluster can be reached on
+- **certificate-authority**: the name of the CA that has signed server certificates
+- **client-certificate**: the user certificate needed to connect to a server
+- **client-key**: the user key which should be kept private
+
+Use **kubectl config set-credentials** command to configure cluster access.
