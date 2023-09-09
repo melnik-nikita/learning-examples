@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: k8s-getting-started-pod-with-storage
+  labels:
+    name: k8s-getting-started-pod-with-storage
+spec:
+  volumes:
+    - name: k8s-getting-started-shared-volume
+      persistentVolumeClaim:
+        claimName: k8s-getting-started-pvc
+  containers:
+  - name: k8s-getting-started-pod-with-storage-1
+    image: centos:7
+    command:
+    - sleep
+    - "3600"
+    volumeMounts:
+      - mountPath: "/shared-storage"
+        name: k8s-getting-started-shared-volume
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+  - name: k8s-getting-started-pod-with-storage-2
+    image: centos:7
+    command:
+    - sleep
+    - "3600"
+    volumeMounts:
+      - mountPath: "/shared-storage"
+        name: k8s-getting-started-shared-volume
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+

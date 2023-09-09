@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  annotations:
+    pv.kubernetes.io/provisioned-by: disk.csi.azure.com
+  name: k8s-getting-started-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: managed-csi
+  csi:
+    driver: disk.csi.azure.com
+    readOnly: false
+    volumeHandle: /subscriptions/b5660973-614a-4852-9dfb-ad3784adbc42/resourceGroups/MC_KubernetesSandboxRG_k8s-getting-started_westeurope/providers/Microsoft.Compute/disks/k8s-getting-started-disk
+    volumeAttributes:
+      fsType: ext4
