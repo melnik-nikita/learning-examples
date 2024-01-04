@@ -1,7 +1,7 @@
 using Amazon.SQS;
-using SQS.Customers.Consumer;
 using Serilog;
-using SQS.Common;
+using SNS.SQS.Common;
+using SQS.Customers.Consumer;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

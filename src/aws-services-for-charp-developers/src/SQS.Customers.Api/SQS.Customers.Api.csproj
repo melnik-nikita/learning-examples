@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SQS.Common\SQS.Common.csproj" />
+        <ProjectReference Include="..\SNS.SQS.Common\SNS.SQS.Common.csproj"/>
     </ItemGroup>
 
 </Project>

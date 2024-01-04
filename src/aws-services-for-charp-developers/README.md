@@ -27,3 +27,23 @@ A message can have such configuration:
 - Maximum message size - up to 256kb
 - Receive message wait time - is the maximum amount of time that polling will wait for messages to become available to
   receive.
+
+## AWS SNS (Simple Notification Service)
+
+Amazon SNS is a highly available, durable, secure, fully managed pub/sub messaging service that enables you to decouple
+microservices, distributed systems, and event-driven serverless applications. Amazon SNS provides topics for
+high-throughput, push-based, many-to-many messaging.
+![How AWS SNS works](./img/how-aws-sns-works.png)
+
+SNS Topic types:
+
+- FIFO
+    - Strictly-preserved message ordering
+    - Exactly-once message delivery
+    - High throughput, up to 300 publishes/second
+    - Subscription protocols: SQS
+- Standard
+    - Best-effort message ordering
+    - At-least once message delivery
+    - Highest throughput in publishes/second
+    - Subscription protocols: SQS, Lambda, HTTP, SMS, email, mobile application endpoints

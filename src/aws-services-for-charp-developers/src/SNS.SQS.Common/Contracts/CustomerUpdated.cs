@@ -1,6 +1,6 @@
-﻿namespace SQS.Common.Contracts;
+﻿namespace SNS.SQS.Common.Contracts;
 
-public class CustomerCreated : IQueueMessage
+public class CustomerUpdated : IQueueMessage
 {
     public required Guid Id { get; init; }
     public required string FullName { get; init; }

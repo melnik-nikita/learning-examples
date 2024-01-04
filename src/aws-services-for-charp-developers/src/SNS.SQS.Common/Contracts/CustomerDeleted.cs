@@ -1,4 +1,4 @@
-﻿namespace SQS.Common.Contracts;
+﻿namespace SNS.SQS.Common.Contracts;
 
 public class CustomerDeleted : IQueueMessage
 {

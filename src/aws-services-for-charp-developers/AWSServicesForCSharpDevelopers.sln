@@ -14,11 +14,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{47AFA82B-282
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQS.Consumer", "src\SQS.Consumer\SQS.Consumer.csproj", "{8E7BAC59-E149-4FBC-928A-801B72A25355}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQS.Common", "src\SQS.Common\SQS.Common.csproj", "{E1A74536-CB72-4FEE-B218-61605630061D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNS.SQS.Common", "src\SNS.SQS.Common\SNS.SQS.Common.csproj", "{E1A74536-CB72-4FEE-B218-61605630061D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQS.Customers.Api", "src\SQS.Customers.Api\SQS.Customers.Api.csproj", "{87F1F44E-93AC-4C64-B4CA-EF6D166CE8C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQS.Customers.Consumer", "src\SQS.Customers.Consumer\SQS.Customers.Consumer.csproj", "{60925402-F902-4C2F-9BCD-6C6269008D9D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{6AB3B8AF-F6C7-4EEB-A828-2C588EA254C7}"
+	ProjectSection(SolutionItems) = preProject
+		img\how-aws-sqs-works.svg = img\how-aws-sqs-works.svg
+		img\how-aws-sns-works.png = img\how-aws-sns-works.png
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNS.Publisher", "src\SNS.Publisher\SNS.Publisher.csproj", "{7CA502D1-EDDB-4556-B058-15BDE737C10F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNS.Consumer", "src\SNS.Consumer\SNS.Consumer.csproj", "{217BACCF-49DF-42BD-9385-C767415A67CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +56,14 @@ Global
 		{60925402-F902-4C2F-9BCD-6C6269008D9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60925402-F902-4C2F-9BCD-6C6269008D9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60925402-F902-4C2F-9BCD-6C6269008D9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA502D1-EDDB-4556-B058-15BDE737C10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA502D1-EDDB-4556-B058-15BDE737C10F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA502D1-EDDB-4556-B058-15BDE737C10F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA502D1-EDDB-4556-B058-15BDE737C10F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{217BACCF-49DF-42BD-9385-C767415A67CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{217BACCF-49DF-42BD-9385-C767415A67CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{217BACCF-49DF-42BD-9385-C767415A67CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{217BACCF-49DF-42BD-9385-C767415A67CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5DBD89ED-3340-453D-A003-226476F4F463} = {47AFA82B-282E-4204-8E0A-BCCF471E91A7}
@@ -53,5 +71,7 @@ Global
 		{E1A74536-CB72-4FEE-B218-61605630061D} = {47AFA82B-282E-4204-8E0A-BCCF471E91A7}
 		{87F1F44E-93AC-4C64-B4CA-EF6D166CE8C1} = {47AFA82B-282E-4204-8E0A-BCCF471E91A7}
 		{60925402-F902-4C2F-9BCD-6C6269008D9D} = {47AFA82B-282E-4204-8E0A-BCCF471E91A7}
+		{7CA502D1-EDDB-4556-B058-15BDE737C10F} = {47AFA82B-282E-4204-8E0A-BCCF471E91A7}
+		{217BACCF-49DF-42BD-9385-C767415A67CE} = {47AFA82B-282E-4204-8E0A-BCCF471E91A7}
 	EndGlobalSection
 EndGlobal

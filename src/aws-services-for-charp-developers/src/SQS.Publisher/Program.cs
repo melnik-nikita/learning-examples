@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Amazon.SQS;
 using Amazon.SQS.Model;
-using SQS.Common.Contracts;
+using SNS.SQS.Common.Contracts;
 
 var sqsClient = new AmazonSQSClient();
 

@@ -3,8 +3,8 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using MediatR;
 using Microsoft.Extensions.Options;
-using SQS.Common;
-using SQS.Common.Contracts;
+using SNS.SQS.Common;
+using SNS.SQS.Common.Contracts;
 
 namespace SQS.Customers.Consumer;
 
@@ -48,7 +48,7 @@ public class QueueConsumerService : BackgroundService
             foreach (var message in receiveMessageResponse.Messages)
             {
                 var messageType = message.MessageAttributes["MessageType"].StringValue;
-                var type = Type.GetType($"SQS.Common.Contracts.{messageType}, {typeof(IQueueMessage).Assembly}");
+                var type = Type.GetType($"SNS.SQS.Common.Contracts.{messageType}, {typeof(IQueueMessage).Assembly}");
 
                 if (type is null)
                 {

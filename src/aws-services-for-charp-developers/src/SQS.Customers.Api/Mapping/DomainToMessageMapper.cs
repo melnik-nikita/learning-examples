@@ -1,4 +1,4 @@
-﻿using SQS.Common.Contracts;
+﻿using SNS.SQS.Common.Contracts;
 using SQS.Customers.Api.Domain;
 
 namespace SQS.Customers.Api.Mapping;

@@ -2,7 +2,7 @@
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Options;
-using SQS.Common;
+using SNS.SQS.Common;
 
 namespace SQS.Customers.Api.Messaging;
 
@@ -37,7 +37,7 @@ public class SqsMessenger : ISqsMessenger
         return response;
     }
 
-    private async Task<string> GetQueueUrlAsync(CancellationToken ct)
+    private async ValueTask<string> GetQueueUrlAsync(CancellationToken ct)
     {
         if (_queueUrl is not null)
         {

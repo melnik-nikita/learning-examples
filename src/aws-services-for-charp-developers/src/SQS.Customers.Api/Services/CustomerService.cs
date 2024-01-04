@@ -1,8 +1,8 @@
-﻿using SQS.Customers.Api.Mapping;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
-using SQS.Common.Contracts;
+using SNS.SQS.Common.Contracts;
 using SQS.Customers.Api.Domain;
+using SQS.Customers.Api.Mapping;
 using SQS.Customers.Api.Messaging;
 using SQS.Customers.Api.Repositories;
 
@@ -12,12 +12,12 @@ public class CustomerService : ICustomerService
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IGitHubService _gitHubService;
-    private readonly ISqsMessenger _sqsMessenger;
+    private readonly ISnsMessenger _sqsMessenger;
 
     public CustomerService(
         ICustomerRepository customerRepository,
         IGitHubService gitHubService,
-        ISqsMessenger sqsMessenger
+        ISnsMessenger sqsMessenger
     )
     {
         _customerRepository = customerRepository;
@@ -46,7 +46,7 @@ public class CustomerService : ICustomerService
 
         if (response)
         {
-            await _sqsMessenger.SendMessageAsync(
+            await _sqsMessenger.PublishMessageAsync(
                 customer.ToCustomerCreatedMessage()
             );
         }
@@ -81,7 +81,7 @@ public class CustomerService : ICustomerService
 
         if (result)
         {
-            await _sqsMessenger.SendMessageAsync(customer.ToCustomerUpdatedMessage());
+            await _sqsMessenger.PublishMessageAsync(customer.ToCustomerUpdatedMessage());
         }
 
         return result;
@@ -92,7 +92,7 @@ public class CustomerService : ICustomerService
         var result = await _customerRepository.DeleteAsync(id);
         if (result)
         {
-            await _sqsMessenger.SendMessageAsync(new CustomerDeleted { Id = id });
+            await _sqsMessenger.PublishMessageAsync(new CustomerDeleted { Id = id });
         }
 
         return result;

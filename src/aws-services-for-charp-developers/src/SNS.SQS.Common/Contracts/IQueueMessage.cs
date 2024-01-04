@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace SQS.Common.Contracts;
+namespace SNS.SQS.Common.Contracts;
 
 public interface IQueueMessage : IRequest
 {

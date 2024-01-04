@@ -1,15 +1,16 @@
+using Amazon.SimpleNotificationService;
 using Amazon.SQS;
-using SQS.Customers.Api.Database;
-using SQS.Customers.Api.Messaging;
-using SQS.Customers.Api.Repositories;
-using SQS.Customers.Api.Services;
-using SQS.Customers.Api.Validation;
 using Dapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
-using SQS.Common;
+using SNS.SQS.Common;
+using SQS.Customers.Api.Database;
+using SQS.Customers.Api.Messaging;
+using SQS.Customers.Api.Repositories;
+using SQS.Customers.Api.Services;
+using SQS.Customers.Api.Validation;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions { Args = args, ContentRootPath = Directory.GetCurrentDirectory() });
 
@@ -40,8 +41,13 @@ builder.Services.AddSingleton<IDbConnectionFactory>(
 builder.Services.AddSingleton<DatabaseInitializer>();
 
 builder.Services.Configure<QueueSettings>(builder.Configuration.GetSection(QueueSettings.Key));
+builder.Services.Configure<TopicSettings>(builder.Configuration.GetSection(TopicSettings.Key));
+
 builder.Services.AddSingleton<IAmazonSQS, AmazonSQSClient>();
+builder.Services.AddSingleton<IAmazonSimpleNotificationService, AmazonSimpleNotificationServiceClient>();
+
 builder.Services.AddSingleton<ISqsMessenger, SqsMessenger>();
+builder.Services.AddSingleton<ISnsMessenger, SnsMessenger>();
 
 builder.Services.AddSingleton<ICustomerRepository, CustomerRepository>();
 builder.Services.AddSingleton<ICustomerService, CustomerService>();

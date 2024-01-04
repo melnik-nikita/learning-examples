@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using SQS.Common.Contracts;
+using SNS.SQS.Common.Contracts;
 
 namespace SQS.Customers.Consumer.Handlers;
 
