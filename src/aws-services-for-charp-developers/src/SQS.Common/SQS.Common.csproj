@@ -6,9 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <AnalysisMode>All</AnalysisMode>
-        <WarningsAsErrors>$(WarningsAsErrors);CA1307;CA1309;CA1310</WarningsAsErrors>
-    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.SQS" Version="3.7.300.29"/>
+        <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
+    </ItemGroup>
 
 </Project>
