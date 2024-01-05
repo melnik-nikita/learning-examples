@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.300.30"/>
+        <PackageReference Include="AWSSDK.S3" Version="3.7.305.5"/>
         <PackageReference Include="Dapper" Version="2.1.28"/>
         <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0"/>

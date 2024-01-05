@@ -96,3 +96,8 @@ partition key value.
 
 Allows to capture item-level changes in your table, and push the changes to a DynamoDB stream. You then can access the
 change information through the DynamoDB Streams API.
+
+## AWS S3 (Simple Storage Service)
+
+Amazon S3 is an object storage service that offers industry-leading scalability, data availability, security, and
+performance
