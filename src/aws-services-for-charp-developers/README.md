@@ -101,3 +101,8 @@ change information through the DynamoDB Streams API.
 
 Amazon S3 is an object storage service that offers industry-leading scalability, data availability, security, and
 performance
+
+## AWS Secrets Manager
+
+AWS Secrets Manager helps you protect access to your applications, services, and IT resources. You can easily rotate,
+manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle.
