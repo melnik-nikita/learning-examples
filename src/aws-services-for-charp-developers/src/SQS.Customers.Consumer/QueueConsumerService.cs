@@ -10,11 +10,11 @@ namespace SQS.Customers.Consumer;
 
 public class QueueConsumerService : BackgroundService
 {
-    private readonly IAmazonSQS _sqs;
+    private readonly ILogger<QueueConsumerService> _logger;
     private readonly IOptions<QueueSettings> _queueSettings;
+    private readonly IAmazonSQS _sqs;
     private readonly IMediator _mediator;
     private string? _queueUrl;
-    private ILogger<QueueConsumerService> _logger;
 
     public QueueConsumerService(
         ILogger<QueueConsumerService> logger,
@@ -82,6 +82,7 @@ public class QueueConsumerService : BackgroundService
 
         var queueUrlResponse = await _sqs.GetQueueUrlAsync(_queueSettings.Value.Name, ct);
         _queueUrl = queueUrlResponse.QueueUrl;
+
         return _queueUrl;
     }
 }

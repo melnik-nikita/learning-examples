@@ -47,3 +47,52 @@ SNS Topic types:
     - At-least once message delivery
     - Highest throughput in publishes/second
     - Subscription protocols: SQS, Lambda, HTTP, SMS, email, mobile application endpoints
+
+## AWS DynamoDB
+
+DynamoDB is a fully managed, key-value, and document database that delivers single-digit-millisecond performance at any
+scale.
+DynamoDB stores data in partitions. A **partition** is an allocation of storage for a table, backed by SSDs and
+automatically replicated across multiple Availability Zones within an AWS Region.
+
+#### Data distribution: Partition Key
+
+If table has a simple primary key (partition key only), DynamoDB stores and retrieves each item based on its partition
+key value. To write an item to the table, DynamoDB uses the value of the partition key as input to an internal hash
+function. The output value from the hash function determines the partition in which the item will be stored. To read an
+item from the table, you must specify the partition key value for the item. DynamoDB uses this value as input to its
+hash function, yielding the partition in which the item can be found.
+
+#### Data distribution: Partition key and sort key
+
+If the table has a composite primary key (partition key and sort key), DynamoDB calculates the hash value of the
+partition key in the same way as described in Data distribution: Partition key. However, it stores all the items with
+the same partition key value physically close together, ordered by sort key value.
+To write an item to the table, DynamoDB calculates the hash value of the partition key to determine which partition
+should contain the item. In that partition, several items could have the same partition key value. So DynamoDB stores
+the item among the others with the same partition key, in ascending order by sort key.
+
+To read an item from the table, you must specify its partition key value and sort key value. DynamoDB calculates the
+partition key's hash value, yielding the partition in which the item can be found.
+
+You can read multiple items from the table in a single operation (Query) if the items you want have the same partition
+key value. DynamoDB returns all of the items with that partition key value. Optionally, you can apply a condition to the
+sort key so that it returns only the items within a certain range of values.
+
+#### Global Secondary index (GSI)
+
+An index with a partition key and a sort key that can be different from those on the base table. A global secondary
+index is considered "global" because queries on the index can span all of the data in the base table, across all
+partitions. A global secondary index is stored in its own partition space away from the base table and scales separately
+from the base table.
+
+#### Local secondary index (LSI)
+
+An index that has the same partition key as the base table, but a different sort key. A local secondary index is "local"
+in the sense that every partition of a local secondary index is scoped to a base table partition that has the same
+partition key value.
+
+#### DynamoDb Streams
+
+Allows to capture item-level changes in your table, and push the changes to a DynamoDB stream. You then can access the
+change information through the DynamoDB Streams API.
