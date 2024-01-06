@@ -106,3 +106,20 @@ performance
 
 AWS Secrets Manager helps you protect access to your applications, services, and IT resources. You can easily rotate,
 manage, and retrieve database credentials, API keys, and other secrets throughout their lifecycle.
+
+# AWS Lambda
+
+AWS Lambda lets you run code without thinking about servers.
+You pay only for the compute time that you consume — there is no charge when your code is not running.
+
+To install .net tooling to CLI:
+
+```sh 
+dotnet tool install -g Amazon.Lambda.Tools
+```
+
+To install amazon .net project templates:
+
+```sh
+dotnet new -i Amazon.Lambda.Templates
+```
