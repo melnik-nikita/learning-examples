@@ -116,7 +116,7 @@ internal static class BackgroundVsForeground
 
         // Start the thread
         t.Start();
-        // If t is a foreground thread, the application won't die fro about 10 seconds
+        // If t is a foreground thread, the application won't die for about 10 seconds
         // If t s a background thread, the application dies immediately
         Console.WriteLine("returning from Run method");
     }

@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "img", "img", "{37FB5E21-DA1
 		img\managed-heap-next-obj-ptr.png = img\managed-heap-next-obj-ptr.png
 		img\reflections-object-model.png = img\reflections-object-model.png
 		img\single-windows-process-with-multiple-appdomains.png = img\single-windows-process-with-multiple-appdomains.png
+		img\objects-in-the-heap-sync-blocks.png = img\objects-in-the-heap-sync-blocks.png
+		img\the-clrs-thread-pool.png = img\the-clrs-thread-pool.png
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLRViaCSharp.Threading", "src\CLRViaCSharp.Threading\CLRViaCSharp.Threading.csproj", "{75FB3FB2-DDA0-46EE-955B-A2F53167BE4D}"
